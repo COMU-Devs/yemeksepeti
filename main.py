@@ -55,20 +55,27 @@ class restaurantQWidget(QWidget):
         super(restaurantQWidget, self).__init__(parent)
         self.parent = parent
         self.values = row
-        name, address, minPayment = row[2:]
 
-        self.restaurantNameLabel = QLabel(row)
+        restaurantId = self.values[0]
+        name, address, minPayment = self.values[2:]
+
+        self.nameLabel = QLabel(str(name))
+        self.addressLabel = QLabel(str(address))
+        self.minpaymentLabel = QLabel(str(address))
+
         self.button = QPushButton("sec")
 
-        self.hLayout = QHBoxLayout()
         self.vLayout = QVBoxLayout()
-        self.vLayout.addWidget(self.restaurantNameLabel)
+        self.vLayout.addWidget(self.nameLabel)
+        self.vLayout.addWidget(self.addressLabel)
+        self.hLayout = QHBoxLayout()
         self.hLayout.addLayout(self.vLayout)
+        self.hLayout.addWidget(self.minpaymentLabel)
         self.hLayout.addWidget(self.button)
         self.setLayout(self.hLayout)
 
         self.button.clicked.connect(
-            lambda: self.parent.listProducts(restaurantName=self.name))
+            lambda: self.parent.listProducts(restaurantId=restaurantId))
 
 
 class menuQWidget(QListWidget):
@@ -78,15 +85,15 @@ class menuQWidget(QListWidget):
         self.listRestaurants()
 
     def listRestaurants(self):
-        conn = sqlite3.connect('company.db')
+        conn = sqlite3.connect('yemeksepeti.db')
         with conn:
             cur = conn.cursor()
-            cur.execute('SELECT dnumber FROM department')
+            cur.execute('SELECT * FROM restaurant')
             result = cur.fetchall()
             for row in (result):
                 item = QListWidgetItem(self)
                 item_widget = restaurantQWidget(
-                    str(row[0]), parent=self)
+                    row, parent=self)
                 item.setSizeHint(item_widget.sizeHint())
                 self.addItem(item)
                 self.setItemWidget(item, item_widget)
