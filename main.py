@@ -18,36 +18,60 @@ from random import randint
 
 
 class productQWidget(QWidget):
-    def __init__(self, productName, ingredients='icindekiler:', imagepath='assets/empty.png', parent=None):
+    def __init__(self, row, imagepath='assets/empty.png', parent=None):
         super(productQWidget, self).__init__(parent)
         self.parent = parent
-        self.productimage = QLabel()
-        self.name = productName
-        self.imgpath = imagepath
+        self.values = row
+
+        productId, name, price, r_id, category, ingredients = row
+        imageUrl = self.getProductImage(productId)
+
+        self.imageLabel = QLabel()
+
         self.imgsizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
         self.imgsizePolicy.setHorizontalStretch(0)
         self.imgsizePolicy.setVerticalStretch(0)
         self.imgsizePolicy.setHeightForWidth(
-            self.productimage.sizePolicy().hasHeightForWidth())
-        self.pixmap = QPixmap(self.imgpath).scaled(
+            self.imageLabel.sizePolicy().hasHeightForWidth())
+        self.pixmap = QPixmap(imageUrl).scaled(
             30, 30, QtCore.Qt.KeepAspectRatio)
-        self.productimage.setSizePolicy(self.imgsizePolicy)
-        self.productimage.setPixmap(self.pixmap)
-        self.productNameLabel = QLabel(self.name)
-        self.ingredientsLabel = QLabel(ingredients)
+
+        self.imageLabel.setSizePolicy(self.imgsizePolicy)
+        self.imageLabel.setPixmap(self.pixmap)
+        self.nameLabel = QLabel(str(name))
+        self.ingredientsLabel = QLabel(str(ingredients))
+        self.categoryLabel = QLabel(str(category))
+        self.priceLabel = QLabel(str(price))
         self.button = QPushButton("+")
+
         self.vLayout = QVBoxLayout()
         self.hLayout = QHBoxLayout()
-        self.vLayout.addWidget(self.productNameLabel)
+        self.vLayout.addWidget(self.nameLabel)
         self.vLayout.addWidget(self.ingredientsLabel)
-        self.hLayout.addWidget(self.productimage)
+        self.vLayout.addWidget(self.ingredientsLabel)
+        self.hLayout.addWidget(self.imageLabel)
         self.hLayout.addLayout(self.vLayout)
         self.hLayout.addWidget(self.button)
 
-        self.setLayout(self.hLayout)
-        self.button.clicked.connect(
-            lambda: self.parent.grandparent.sepet.addSepetItem(self.name))
+        # self.setLayout(self.hLayout)
+        # self.button.clicked.connect(
+        #     lambda: self.parent.grandparent.sepet.addSepetItem(self.name))
+
+    def getProductImage(self, productId):
+        url = 'assets/empty.png'
+        conn = sqlite3.connect('yemeksepeti.db')
+        with conn:
+            cur = conn.cursor()
+            cur.execute(
+                'SELECT url FROM product_image WHERE p_id=' + str(productId))
+            result = cur.fetchall()
+            if len(result) == 1:
+                url = result[0]
+            cur = None
+        conn = None
+
+        return url
 
 
 class restaurantQWidget(QWidget):
@@ -56,7 +80,7 @@ class restaurantQWidget(QWidget):
         self.parent = parent
         self.values = row
 
-        restaurantId = self.values[0]
+        self.restaurantId = self.values[0]
         name, address, minPayment = self.values[2:]
 
         self.nameLabel = QLabel(str(name))
@@ -100,18 +124,18 @@ class menuQWidget(QListWidget):
             cur = None
         conn = None
 
-    def listProducts(self, restaurantName):
+    def listProducts(self, restaurantId):
         self.clear()
-        print(restaurantName)
-        conn = sqlite3.connect('company.db')
+        conn = sqlite3.connect('yemeksepeti.db')
         with conn:
             cur = conn.cursor()
-            cur.execute('SELECT * FROM employee WHERE dno = ' + restaurantName)
+            cur.execute('SELECT * FROM product WHERE r_id=' +
+                        str(restaurantId))
             result = cur.fetchall()
             for row in (result):
                 item = QListWidgetItem(self)
                 item_widget = productQWidget(
-                    str(row[0]), parent=self)
+                    row, parent=self)
                 item.setSizeHint(item_widget.sizeHint())
                 self.addItem(item)
                 self.setItemWidget(item, item_widget)
@@ -258,8 +282,10 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName("tabWidget")
-        self.tab = QtWidgets.QWidget()
-        self.tab.setObjectName("tab")
+
+# ---INIT TAB: ANASAYFA
+        self.tab = QtWidgets.QWidget()  # tab = anasayfa
+        self.tab.setObjectName("Anasayfa")
 
         self.menu = menuQWidget(self.tab, grandparent=self)
         self.menu.setGeometry(QtCore.QRect(30, 40, 421, 441))
@@ -273,16 +299,27 @@ class Ui_MainWindow(object):
         self.orders.setGeometry(QtCore.QRect(450, 260, 421, 220))
         self.orders.setObjectName('orders')
 
-        self.tabWidget.addTab(self.tab, "")
-        self.tab_3 = QtWidgets.QWidget()
-        self.tab_3.setObjectName("tab_3")
-        self.tabWidget.addTab(self.tab_3, "")
-        self.tab_4 = QtWidgets.QWidget()
-        self.tab_4.setObjectName("tab_4")
-        self.tabWidget.addTab(self.tab_4, "")
-        self.tab_2 = QtWidgets.QWidget()
-        self.tab_2.setObjectName("tab_2")
-        self.tabWidget.addTab(self.tab_2, "")
+        self.tabWidget.addTab(self.tab, "")  # adding tab to tabWidget
+# ---END OF TAB: ANASAYFA
+# ---INIT TAB: ADMIN
+        self.tab_2 = QtWidgets.QWidget()  # tab_2 = Admin
+        self.tab_2.setObjectName("Admin")
+
+        self.tabWidget.addTab(self.tab_2, "")  # adding tab_2 to tabWidget
+# ---END OF TAB: ADMIN
+# ---INIT TAB: SATICI
+        self.tab_3 = QtWidgets.QWidget()  # tab_3 = Satici
+        self.tab_3.setObjectName("Satici")
+
+        self.tabWidget.addTab(self.tab_3, "")  # adding tab_3 to tabWidget
+# ---END OF TAB: SATICI
+# ---INIT TAB: PROFIL
+        self.tab_4 = QtWidgets.QWidget()  # tab_4 = Profil
+        self.tab_4.setObjectName("Profil")
+
+        self.tabWidget.addTab(self.tab_4, "")  # adding tab_4 to tabWidget
+# ---END OF TAB: PROFIL
+
         self.horizontalLayout.addWidget(self.tabWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -303,11 +340,11 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(
             self.tab), _translate("MainWindow", "Anasayfa"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(
-            self.tab_3), _translate("MainWindow", "Profil"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(
-            self.tab_4), _translate("MainWindow", "Satıcı"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(
             self.tab_2), _translate("MainWindow", "Admin"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(
+            self.tab_3), _translate("MainWindow", "Satici"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(
+            self.tab_4), _translate("MainWindow", "Profil"))
 
 
 if __name__ == "__main__":
