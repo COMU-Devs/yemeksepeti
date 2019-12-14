@@ -18,7 +18,7 @@ from random import randint
 
 
 class productQWidget(QWidget):
-    def __init__(self, productName, ingredients='icindekiler:', imagepath='empty.png', parent=None):
+    def __init__(self, productName, ingredients='icindekiler:', imagepath='assets/empty.png', parent=None):
         super(productQWidget, self).__init__(parent)
         self.parent = parent
         self.productimage = QLabel()
@@ -51,30 +51,22 @@ class productQWidget(QWidget):
 
 
 class restaurantQWidget(QWidget):
-    def __init__(self, restaurantName, imagepath='empty.png', parent=None):
+    def __init__(self, row, parent=None):
         super(restaurantQWidget, self).__init__(parent)
         self.parent = parent
-        self.name = restaurantName
-        self.productimage = QLabel()
-        self.imgsizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
-        self.imgsizePolicy.setHorizontalStretch(0)
-        self.imgsizePolicy.setVerticalStretch(0)
-        self.imgsizePolicy.setHeightForWidth(
-            self.productimage.sizePolicy().hasHeightForWidth())
-        self.pixmap = QPixmap(imagepath).scaled(
-            30, 30, QtCore.Qt.KeepAspectRatio)
-        self.productimage.setSizePolicy(self.imgsizePolicy)
-        self.productimage.setPixmap(self.pixmap)
-        self.productNameLabel = QLabel(self.name)
+        self.values = row
+        name, address, minPayment = row[2:]
+
+        self.restaurantNameLabel = QLabel(row)
         self.button = QPushButton("sec")
+
         self.hLayout = QHBoxLayout()
         self.vLayout = QVBoxLayout()
-        self.vLayout.addWidget(self.productNameLabel)
-        self.hLayout.addWidget(self.productimage)
+        self.vLayout.addWidget(self.restaurantNameLabel)
         self.hLayout.addLayout(self.vLayout)
         self.hLayout.addWidget(self.button)
         self.setLayout(self.hLayout)
+
         self.button.clicked.connect(
             lambda: self.parent.listProducts(restaurantName=self.name))
 
@@ -121,7 +113,7 @@ class menuQWidget(QListWidget):
 
 
 class sepetItemQWidget(QWidget):
-    def __init__(self, itemName, amount, imagepath='empty.png', parent=None):
+    def __init__(self, itemName, amount, imagepath='assets/empty.png', parent=None):
         super(sepetItemQWidget, self).__init__(parent)
         self.parent = parent
         self.name = itemName
@@ -149,6 +141,7 @@ class sepetItemQWidget(QWidget):
         self.hLayout.addWidget(self.button)
         self.hLayout.addWidget(self.button2)
         self.setLayout(self.hLayout)
+        # TODO: add button1's connection.
         self.button2.clicked.connect(
             lambda: self.parent.removeSepetItem(self.name))
 
@@ -160,15 +153,14 @@ class sepetQWidget(QListWidget):
 
     def listSepetItems(self):
         self.clear()
-        conn = sqlite3.connect('company.db')
+        conn = sqlite3.connect('yemeksepeti.db')
         with conn:
             cur = conn.cursor()
-            cur.execute('SELECT * FROM project')
+            cur.execute('SELECT * FROM restaurant')
             result = cur.fetchall()
             for row in (result):
                 item = QListWidgetItem(self)
-                item_widget = sepetItemQWidget(
-                    str(row[0]), 1, parent=self)
+                item_widget = sepetItemQWidget(row, 1, parent=self)
                 item.setSizeHint(item_widget.sizeHint())
                 self.addItem(item)
                 self.setItemWidget(item, item_widget)
@@ -208,7 +200,7 @@ class sepetQWidget(QListWidget):
 
 
 class orderItemQWidget(QWidget):
-    def __init__(self, orderName, imagepath='empty.png', parent=None):
+    def __init__(self, orderName, imagepath='assets/empty.png', parent=None):
         super(orderItemQWidget, self).__init__(parent)
         self.parent = parent
         self.name = orderName
