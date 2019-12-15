@@ -308,18 +308,21 @@ class Ui_MainWindow(object):
 
         self.tabWidget.addTab(self.tab, "")  # adding tab to tabWidget
         # ---END OF TAB: ANASAYFA
+
         # ---INIT TAB: ADMIN
         self.tab_2 = QtWidgets.QWidget()  # tab_2 = Admin
         self.tab_2.setObjectName("Admin")
-
+        
         self.tabWidget.addTab(self.tab_2, "")  # adding tab_2 to tabWidget
         # ---END OF TAB: ADMIN
+
         # ---INIT TAB: SATICI
         self.tab_3 = QtWidgets.QWidget()  # tab_3 = Satici
         self.tab_3.setObjectName("Satici")
 
         self.tabWidget.addTab(self.tab_3, "")  # adding tab_3 to tabWidget
         # ---END OF TAB: SATICI
+
         # ---INIT TAB: PROFIL
         self.tab_4 = QtWidgets.QWidget()  # tab_4 = Profil
         self.tab_4.setObjectName("Profil")
