@@ -290,7 +290,7 @@ class Ui_MainWindow(object):
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName("tabWidget")
 
-# ---INIT TAB: ANASAYFA
+        # ---INIT TAB: ANASAYFA
         self.tab = QtWidgets.QWidget()  # tab = anasayfa
         self.tab.setObjectName("Anasayfa")
 
@@ -307,25 +307,25 @@ class Ui_MainWindow(object):
         self.orders.setObjectName('orders')
 
         self.tabWidget.addTab(self.tab, "")  # adding tab to tabWidget
-# ---END OF TAB: ANASAYFA
-# ---INIT TAB: ADMIN
+        # ---END OF TAB: ANASAYFA
+        # ---INIT TAB: ADMIN
         self.tab_2 = QtWidgets.QWidget()  # tab_2 = Admin
         self.tab_2.setObjectName("Admin")
 
         self.tabWidget.addTab(self.tab_2, "")  # adding tab_2 to tabWidget
-# ---END OF TAB: ADMIN
-# ---INIT TAB: SATICI
+        # ---END OF TAB: ADMIN
+        # ---INIT TAB: SATICI
         self.tab_3 = QtWidgets.QWidget()  # tab_3 = Satici
         self.tab_3.setObjectName("Satici")
 
         self.tabWidget.addTab(self.tab_3, "")  # adding tab_3 to tabWidget
-# ---END OF TAB: SATICI
-# ---INIT TAB: PROFIL
+        # ---END OF TAB: SATICI
+        # ---INIT TAB: PROFIL
         self.tab_4 = QtWidgets.QWidget()  # tab_4 = Profil
         self.tab_4.setObjectName("Profil")
 
         self.tabWidget.addTab(self.tab_4, "")  # adding tab_4 to tabWidget
-# ---END OF TAB: PROFIL
+        # ---END OF TAB: PROFIL
 
         self.horizontalLayout.addWidget(self.tabWidget)
         MainWindow.setCentralWidget(self.centralwidget)
