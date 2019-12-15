@@ -16,6 +16,16 @@ from PyQt5.QtGui import QIcon, QPixmap
 import sqlite3
 from random import randint
 
+authInfo = {
+    'id': 'thmyris',
+    'password': '5',
+    'type': 'customer'
+}
+
+
+conn = sqlite3.connect('yemeksepeti.db')
+cur = conn.cursor()
+
 
 class productQWidget(QWidget):
     def __init__(self, row, imagepath='assets/empty.png', parent=None):
@@ -25,7 +35,6 @@ class productQWidget(QWidget):
 
         productId, name, price, r_id, category, ingredients = row
         imageUrl = self.getProductImage(productId)
-
         self.imageLabel = QLabel()
 
         self.imgsizePolicy = QtWidgets.QSizePolicy(
@@ -49,27 +58,23 @@ class productQWidget(QWidget):
         self.hLayout = QHBoxLayout()
         self.vLayout.addWidget(self.nameLabel)
         self.vLayout.addWidget(self.ingredientsLabel)
-        self.vLayout.addWidget(self.ingredientsLabel)
+        self.vLayout.addWidget(self.categoryLabel)
         self.hLayout.addWidget(self.imageLabel)
         self.hLayout.addLayout(self.vLayout)
         self.hLayout.addWidget(self.button)
 
-        # self.setLayout(self.hLayout)
-        # self.button.clicked.connect(
-        #     lambda: self.parent.grandparent.sepet.addSepetItem(self.name))
+        self.setLayout(self.hLayout)
+        self.button.clicked.connect(
+            lambda: self.parent.grandparent.sepet.addSepetItem(productId))
 
     def getProductImage(self, productId):
+        global cur
         url = 'assets/empty.png'
-        conn = sqlite3.connect('yemeksepeti.db')
-        with conn:
-            cur = conn.cursor()
-            cur.execute(
-                'SELECT url FROM product_image WHERE p_id=' + str(productId))
-            result = cur.fetchall()
-            if len(result) == 1:
-                url = result[0]
-            cur = None
-        conn = None
+        cur.execute(
+            'SELECT url FROM product_image WHERE p_id=' + str(productId))
+        result = cur.fetchall()
+        if len(result) == 1:
+            url = result[0]
 
         return url
 
@@ -80,7 +85,7 @@ class restaurantQWidget(QWidget):
         self.parent = parent
         self.values = row
 
-        self.restaurantId = self.values[0]
+        restaurantId = self.values[0]
         name, address, minPayment = self.values[2:]
 
         self.nameLabel = QLabel(str(name))
@@ -109,122 +114,129 @@ class menuQWidget(QListWidget):
         self.listRestaurants()
 
     def listRestaurants(self):
-        conn = sqlite3.connect('yemeksepeti.db')
-        with conn:
-            cur = conn.cursor()
-            cur.execute('SELECT * FROM restaurant')
-            result = cur.fetchall()
-            for row in (result):
-                item = QListWidgetItem(self)
-                item_widget = restaurantQWidget(
-                    row, parent=self)
-                item.setSizeHint(item_widget.sizeHint())
-                self.addItem(item)
-                self.setItemWidget(item, item_widget)
-            cur = None
-        conn = None
+        global cur
+        cur.execute('SELECT * FROM restaurant')
+        result = cur.fetchall()
+        for row in (result):
+            item = QListWidgetItem(self)
+            item_widget = restaurantQWidget(
+                row, parent=self)
+            item.setSizeHint(item_widget.sizeHint())
+            self.addItem(item)
+            self.setItemWidget(item, item_widget)
 
     def listProducts(self, restaurantId):
         self.clear()
-        conn = sqlite3.connect('yemeksepeti.db')
-        with conn:
-            cur = conn.cursor()
-            cur.execute('SELECT * FROM product WHERE r_id=' +
-                        str(restaurantId))
-            result = cur.fetchall()
-            for row in (result):
-                item = QListWidgetItem(self)
-                item_widget = productQWidget(
-                    row, parent=self)
-                item.setSizeHint(item_widget.sizeHint())
-                self.addItem(item)
-                self.setItemWidget(item, item_widget)
-            cur = None
-        conn = None
+        global cur
+        cur.execute('SELECT * FROM product WHERE r_id=' +
+                    str(restaurantId))
+        result = cur.fetchall()
+        for row in result:
+            item = QListWidgetItem(self)
+            item_widget = productQWidget(
+                row, parent=self)
+            item.setSizeHint(item_widget.sizeHint())
+            self.addItem(item)
+            self.setItemWidget(item, item_widget)
 
 
 class sepetItemQWidget(QWidget):
-    def __init__(self, itemName, amount, imagepath='assets/empty.png', parent=None):
+    def __init__(self, row, parent=None):
         super(sepetItemQWidget, self).__init__(parent)
         self.parent = parent
-        self.name = itemName
-        self.amount = amount
-        self.productimage = QLabel()
-        self.imgsizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
-        self.imgsizePolicy.setHorizontalStretch(0)
-        self.imgsizePolicy.setVerticalStretch(0)
-        self.imgsizePolicy.setHeightForWidth(
-            self.productimage.sizePolicy().hasHeightForWidth())
-        self.pixmap = QPixmap(imagepath).scaled(
-            30, 30, QtCore.Qt.KeepAspectRatio)
-        self.productimage.setSizePolicy(self.imgsizePolicy)
-        self.productimage.setPixmap(self.pixmap)
-        self.productNameLabel = QLabel(self.name)
+        orderLineId, quantity, p_id, order_id = row
+        productName, productPrice = self.getProduct(p_id)
+
+        self.productNameLabel = QLabel(str(productName))
+        self.quantityLabel = QLabel(str(quantity))
+        self.priceLabel = QLabel(str(int(quantity) * int(productPrice)))
+
         self.hLayout = QHBoxLayout()
         self.vLayout = QVBoxLayout()
+        # TODO: buttonIncrease, buttonDecrease olarak degistirilir mi bu button degisken isimleri?
         self.button = QPushButton("+")
         self.button2 = QPushButton('-')
-        self.amountLabel = QLabel(str(self.amount))
-        self.hLayout.addWidget(self.productimage)
+
+        self.vLayout.addWidget(self.button)
+        self.vLayout.addWidget(self.button2)
+
         self.hLayout.addWidget(self.productNameLabel)
-        self.hLayout.addWidget(self.amountLabel)
-        self.hLayout.addWidget(self.button)
-        self.hLayout.addWidget(self.button2)
+        self.hLayout.addWidget(self.quantityLabel)
+        self.hLayout.addLayout(self.vLayout)
+
         self.setLayout(self.hLayout)
         # TODO: add button1's connection.
-        self.button2.clicked.connect(
-            lambda: self.parent.removeSepetItem(self.name))
+        # self.button2.clicked.connect(
+        #     lambda: self.parent.removeSepetItem(self.name))
+
+    def getProduct(self, productId):
+        global cur
+        cur.execute('SELECT * FROM product WHERE id = '+str(productId))
+        result = cur.fetchall()
+        return result
 
 
 class sepetQWidget(QListWidget):
     def __init__(self, parent=None, grandparent=None):
         QListWidget.__init__(self, parent)
+        self.orderId = self.getOrderId()
         # self.listSepetItems()
 
+    def getOrderId(self):
+        global conn, cur, authInfo
+        # eger bos sepet varsa id o sepetin id sini dondur
+        # yoksa bos bir sepet olustur ve id sini dondur
+        cur.execute('SELECT id FROM order_table WHERE cus_id = \"' +
+                    str(authInfo['id']) + '\" and purchase_date is NULL')
+        result = cur.fetchall()
+        if len(result) == 1:
+            orderId = result[0][0]
+            return orderId
+
+        else:
+            # insert new record with date = NULL
+            cur.execute("INSERT INTO order_table(id, purchase_date, cus_id)" +
+                        "VALUES( NULL, NULL, \"" + str(authInfo['id']) + "\")"
+                        )
+
+            conn.commit()
+
+            cur.execute('SELECT id FROM order_table WHERE cus_id = \"' +
+                        str(authInfo['id']) + '\" and purchase_date is NULL LIMIT 1')
+
+            orderId = cur.fetchall()[0]
+            return orderId
+
     def listSepetItems(self):
+        global authInfo, cur
         self.clear()
-        conn = sqlite3.connect('yemeksepeti.db')
-        with conn:
-            cur = conn.cursor()
-            cur.execute('SELECT * FROM restaurant')
-            result = cur.fetchall()
-            for row in (result):
-                item = QListWidgetItem(self)
-                item_widget = sepetItemQWidget(row, 1, parent=self)
-                item.setSizeHint(item_widget.sizeHint())
-                self.addItem(item)
-                self.setItemWidget(item, item_widget)
-            cur = None
-        conn = None
+        cur.execute('SELECT * FROM order_line WHERE ')
+        result = cur.fetchall()
+        for row in result:
+            item = QListWidgetItem(self)
+            item_widget = sepetItemQWidget(row, 1, parent=self)
+            item.setSizeHint(item_widget.sizeHint())
+            self.addItem(item)
+            self.setItemWidget(item, item_widget)
 
-    def addSepetItem(self, name):
-        conn = None
-        conn = sqlite3.connect('company.db')
-        with conn:
-            cur = conn.cursor()
-            x, y, z, t = str(randint(0, 99999999)), randint(
-                0, 99999999), name, randint(0, 99999999)
-            cur.execute(
-                "INSERT INTO project(pname,pnumber,plocation,dnum)" +
-                f"VALUES('{x}', '{y}', '{z}', '{t}')"
-            )
-            cur = None
-        conn = None
+    def addSepetItem(self, productId):
+        # print(productId)
+        global cur
+        x, y, z, t = str(randint(0, 99999999)), randint(
+            0, 99999999), name, randint(0, 99999999)
+        cur.execute(
+            "INSERT INTO order_line(pname,pnumber,plocation,dnum)" +
+            f"VALUES('{x}', '{y}', '{z}', '{t}')"
+        )
 
-        self.listSepetItems()
+        # self.listSepetItems()
 
     def removeSepetItem(self, name):
         # if not item's amount == 1:
-        conn = None
-        conn = sqlite3.connect('company.db')
-        with conn:
-            cur = conn.cursor()
-            cur.execute(
-                "DELETE FROM project WHERE pname =" + str(name)
-            )
-            cur = None
-        conn = None
+        global cur
+        cur.execute(
+            "DELETE FROM project WHERE pname =" + str(name)
+        )
         # else amount -= 1
 
         self.listSepetItems()
@@ -255,20 +267,15 @@ class orderQWidget(QListWidget):
 
     def listOrders(self):
         self.clear()
-        conn = sqlite3.connect('company.db')
-        with conn:
-            cur = conn.cursor()
-            cur.execute('SELECT * FROM works_on')
-            result = cur.fetchall()
-            for row in (result):
-                item = QListWidgetItem(self)
-                item_widget = orderItemQWidget(
-                    str(row[0]), 1, parent=self)
-                item.setSizeHint(item_widget.sizeHint())
-                self.addItem(item)
-                self.setItemWidget(item, item_widget)
-            cur = None
-        conn = None
+        global cur
+        cur.execute('SELECT * FROM works_on')
+        result = cur.fetchall()
+        for row in result:
+            item = QListWidgetItem(self)
+            item_widget = orderItemQWidget(row, 1, parent=self)
+            item.setSizeHint(item_widget.sizeHint())
+            self.addItem(item)
+            self.setItemWidget(item, item_widget)
 
 
 class Ui_MainWindow(object):
