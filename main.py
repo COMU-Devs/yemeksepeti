@@ -309,7 +309,7 @@ class adminRestaurantBoxItemQWidget(QWidget):
         restId, restPass, name, address, minPayment = self.values[0:]
 
         self.restIdLabel = QLabel(str(restId))
-        self.restPassLabel = QLabel(str(restId))
+        self.restPassLabel = QLabel(str(restPass))
         self.nameLabel = QLabel(str(name))
         self.addressLabel = QLabel(str(address))
         self.minPaymentLabel = QLabel(str(minPayment))
@@ -318,9 +318,10 @@ class adminRestaurantBoxItemQWidget(QWidget):
 
         self.vLayout = QVBoxLayout()
         self.hLayout = QHBoxLayout()
+        self.hLayout.addWidget(self.button)
         self.vLayout.addWidget(self.nameLabel)
         self.vLayout.addWidget(self.addressLabel)
-        self.hLayout.addWidget(self.button)
+        self.vLayout.addWidget(self.restPassLabel)
         self.hLayout.addLayout(self.vLayout)
         self.hLayout.addWidget(self.minPaymentLabel)
         self.setLayout(self.hLayout)
