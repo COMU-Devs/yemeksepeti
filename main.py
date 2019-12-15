@@ -171,7 +171,7 @@ class sepetItemQWidget(QWidget):
 
     def getProduct(self, productId):
         global cur
-        cur.execute('SELECT * FROM product WHERE id = '+str(productId))
+        cur.execute('SELECT * FROM product WHERE id = ' + str(productId))
         result = cur.fetchall()
         return result
 
@@ -278,6 +278,57 @@ class orderQWidget(QListWidget):
             self.setItemWidget(item, item_widget)
 
 
+# TODO admin/restorantablosubox na donusturulecek. menuQWidgetin kopyasiydi.
+class adminRestaurantBoxQWidget(QListWidget):
+    def __init__(self, parent=None, grandparent=None):
+        QListWidget.__init__(self, parent)
+        self.grandparent = grandparent
+        self.listRestaurants()
+
+    def listRestaurants(self):  # TODO listRestaurantsi duzelt
+        global cur
+        cur.execute('SELECT * FROM restaurant')
+        result = cur.fetchall()
+        for row in (result):
+            item = QListWidgetItem(self)
+            item_widget = adminRestaurantBoxItemQWidget(
+                row, parent=self)
+            item.setSizeHint(item_widget.sizeHint())
+            self.addItem(item)
+            self.setItemWidget(item, item_widget)
+
+
+# TODO admin/restorantablosulistesi ne donusturulecek. restaurantQWidgetin kopyasiydi.
+class adminRestaurantBoxItemQWidget(QWidget):
+    def __init__(self, row, parent=None):
+        super(adminRestaurantBoxItemQWidget, self).__init__(parent)
+        self.parent = parent
+        self.values = row
+
+        restaurantId = self.values[0]
+        restId, restPass, name, address, minPayment = self.values[0:]
+
+        self.restIdLabel = QLabel(str(restId))
+        self.restPassLabel = QLabel(str(restId))
+        self.nameLabel = QLabel(str(name))
+        self.addressLabel = QLabel(str(address))
+        self.minPaymentLabel = QLabel(str(minPayment))
+
+        self.button = QPushButton("Seç")
+
+        self.vLayout = QVBoxLayout()
+        self.hLayout = QHBoxLayout()
+        self.vLayout.addWidget(self.nameLabel)
+        self.vLayout.addWidget(self.addressLabel)
+        self.hLayout.addWidget(self.button)
+        self.hLayout.addLayout(self.vLayout)
+        self.hLayout.addWidget(self.minPaymentLabel)
+        self.setLayout(self.hLayout)
+
+        self.button.clicked.connect(
+            lambda: self.parent.listProducts(restaurantId=restaurantId))
+
+
 class Ui_MainWindow(object):
 
     def setupUi(self, MainWindow):
@@ -312,7 +363,12 @@ class Ui_MainWindow(object):
         # ---INIT TAB: ADMIN
         self.tab_2 = QtWidgets.QWidget()  # tab_2 = Admin
         self.tab_2.setObjectName("Admin")
-        
+
+        self.adminRestaurantBox = adminRestaurantBoxQWidget(
+            self.tab_2, grandparent=self)
+        self.adminRestaurantBox.setGeometry(QtCore.QRect(30, 40, 1000, 250))
+        self.adminRestaurantBox.setObjectName('listOfRestaurants')
+
         self.tabWidget.addTab(self.tab_2, "")  # adding tab_2 to tabWidget
         # ---END OF TAB: ADMIN
 
