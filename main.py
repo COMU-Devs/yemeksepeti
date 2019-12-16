@@ -361,11 +361,27 @@ class saticiQWidget(QListWidget):
             self.addItem(item)
             self.setItemWidget(item, item_widget)
 
-    def silme(self, productId):
+
+class profileQWidget(QWidget):  # yattim allah kaldir beni
+    # proful guncelleme olayi burdan yazilacak
+    # textin ici doldurulup kaydete basinca databasede degsiim yapicalak
+    # haydi kg
+    def __init__(self, row, parent=None):
+        super(profileQWidget, self).__init__(parent)
+        self.parent = parent
+        self.values = row
+
+        profileId, password, fname, lname, telNo, addresss = row
+
+        self.button = QPushButton("Guncelle")
+        self.button.clicked.connect(
+            lambda: self.parent.grandparent.showSaticiGuncelleme(profileId))  # show static Guncelleme
+
+    def profilGuncelleme(self, profileId):
         global cur, conn, authInfo
-        cur.execute('DELETE FROM product WHERE product.id ='+str(productId))
+        cur.execute('DELETE FROM product WHERE product.id ='+str(profileId))
         cur.execute(
-            'DELETE FROM product_image WHERE product_image.p_id ='+str(productId))
+            'DELETE FROM product_image WHERE product_image.p_id ='+str(profileId))
         conn.commit()
         self.listOrders()
 
@@ -727,6 +743,10 @@ class Ui_MainWindow(object):
         self.saticiguncelleme.p_id = productId
         self.saticiguncelleme.ui.setFields(name, price, category, ingred)
         self.saticiguncelleme.show()
+
+    def profıleUpdate(self):
+
+        pass
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
