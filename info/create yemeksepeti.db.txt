@@ -1,0 +1,8 @@
+create table restaurant (
+  dname char(20) not null,
+  dnumber numeric(1) not null,
+  mgrssn numeric(9) not null,
+  mgrstartdate date not null,
+  primary key (dnumber),
+  unique (dname)
+);

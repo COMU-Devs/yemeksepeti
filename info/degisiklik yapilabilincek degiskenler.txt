@@ -1,0 +1,26 @@
+Uzerinde degisiklik yapilabilincek var'lar
+
+Add / Omit(biz):
+1- restoran ekleme cikarma (restoranin idsini ve sifresini admin belirlicek)
+
+   Satici:
+    1- yemek ekleme çıkarma (restoran sahibi tarafından)(ürün resmi de eklenecek)(kategoriler de olcak)
+    2- fiyat guncelleme
+    3- min fiyat guncelleme
+    4- restoran adresi gunc
+    5- restoran ismi gunc
+
+   Musteri:
+    1- Adres degistirme / ekleme cikarma
+    2- Telefon degistirme / ekleme cikarma
+
+
+
+Sepet:
+1- yemek ekleme cikarma(sayi degistirme)
+2- Satin al
+3- urun sayisi
+
+Restoranin yorum kismi:
+1- musteri yorum yapacak (auth var)
+2- hiz, lezzet, sunum puanlamasi olcak (restoranin ana sayfasinda ortala puanlar goruncek)
