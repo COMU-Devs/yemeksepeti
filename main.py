@@ -18,8 +18,8 @@ import sqlite3
 from random import randint
 
 authInfo = {
-    'id': '1',
-    'password': '5',
+    'id': 'thmyris',
+    'password': '54',
     'type': 'customer'
 }
 
@@ -361,27 +361,14 @@ class saticiQWidget(QListWidget):
             self.addItem(item)
             self.setItemWidget(item, item_widget)
 
-
-class profileQWidget(QWidget):  # yattim allah kaldir beni
-    # proful guncelleme olayi burdan yazilacak
-    # textin ici doldurulup kaydete basinca databasede degsiim yapicalak
-    # haydi kg
-    def __init__(self, row, parent=None):
-        super(profileQWidget, self).__init__(parent)
-        self.parent = parent
-        self.values = row
-
-        profileId, password, fname, lname, telNo, addresss = row
-
-        self.button = QPushButton("Guncelle")
-        self.button.clicked.connect(
-            lambda: self.parent.grandparent.showSaticiGuncelleme(profileId))  # show static Guncelleme
-
-    def profilGuncelleme(self, profileId):
+    def silme(self, productId):
         global cur, conn, authInfo
-        cur.execute('DELETE FROM product WHERE product.id ='+str(profileId))
+        cur. execute(
+            ' DELETE FROM product WHERE product.id = ' + str(productId))
         cur.execute(
-            'DELETE FROM product_image WHERE product_image.p_id ='+str(profileId))
+            'DELETE FROM product_image WHERE product_image.p_id = ' +
+            str(productId)
+        )
         conn.commit()
         self.listOrders()
 
@@ -494,6 +481,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1087, 666)
+        global authInfo
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -527,189 +515,216 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab_2, "")  # adding tab_2 to tabWidget
 # ---END OF TAB: ADMIN
 # ---INIT TAB: SATICI
-        self.tab_3 = QtWidgets.QWidget()  # tab_3 = Satici
-        self.tab_3.setObjectName("Satici")
+        if authInfo['type'] == 'restaurant':
+            self.tab_3 = QtWidgets.QWidget()  # tab_3 = Satici
+            self.tab_3.setObjectName("Satici")
 
-        self.satici_listView = saticiQWidget(self.tab_3, grandparent=self)
-        self.satici_listView.setGeometry(QtCore.QRect(50, 50, 441, 231))
-        self.satici_listView.setObjectName("listView")  # yemekler
+            self.satici_listView = saticiQWidget(self.tab_3, grandparent=self)
+            self.satici_listView.setGeometry(QtCore.QRect(50, 50, 441, 231))
+            self.satici_listView.setObjectName("listView")  # yemekler
 
-        self.satici_yemekler = QtWidgets.QLabel(self.tab_3)
-        self.satici_yemekler.setGeometry(QtCore.QRect(50, 30, 67, 17))
-        self.satici_yemekler.setObjectName("yemekler")
+            self.satici_yemekler = QtWidgets.QLabel(self.tab_3)
+            self.satici_yemekler.setGeometry(QtCore.QRect(50, 30, 67, 17))
+            self.satici_yemekler.setObjectName("yemekler")
 
-        self.satici_listeyeEkleButton = QtWidgets.QPushButton(self.tab_3)
-        self.satici_listeyeEkleButton.setGeometry(
-            QtCore.QRect(390, 450, 89, 25))
-        self.satici_listeyeEkleButton.setCheckable(True)
-        self.satici_listeyeEkleButton.setObjectName("listeyeEkleButton")
-        self.satici_listeyeEkleButton.clicked.connect(self.listeyeEkle)
+            self.satici_listeyeEkleButton = QtWidgets.QPushButton(self.tab_3)
+            self.satici_listeyeEkleButton.setGeometry(
+                QtCore.QRect(390, 450, 89, 25))
+            self.satici_listeyeEkleButton.setCheckable(True)
+            self.satici_listeyeEkleButton.setObjectName("listeyeEkleButton")
+            self.satici_listeyeEkleButton.clicked.connect(self.listeyeEkle)
 
-        self.satici_productNameText = QtWidgets.QTextEdit(self.tab_3)
-        self.satici_productNameText.setGeometry(
-            QtCore.QRect(190, 290, 301, 31))
-        self.satici_productNameText.setObjectName("productNameText")
+            self.satici_productNameText = QtWidgets.QTextEdit(self.tab_3)
+            self.satici_productNameText.setGeometry(
+                QtCore.QRect(190, 290, 301, 31))
+            self.satici_productNameText.setObjectName("productNameText")
 
-        self.satici_productPriceText = QtWidgets.QTextEdit(self.tab_3)
-        self.satici_productPriceText.setGeometry(
-            QtCore.QRect(190, 330, 301, 31))
-        self.satici_productPriceText.setObjectName("productPriceText")
+            self.satici_productPriceText = QtWidgets.QTextEdit(self.tab_3)
+            self.satici_productPriceText.setGeometry(
+                QtCore.QRect(190, 330, 301, 31))
+            self.satici_productPriceText.setObjectName("productPriceText")
 
-        self.satici_categoryText = QtWidgets.QTextEdit(self.tab_3)
-        self.satici_categoryText.setGeometry(QtCore.QRect(190, 370, 301, 31))
-        self.satici_categoryText.setObjectName("categoryText")
+            self.satici_categoryText = QtWidgets.QTextEdit(self.tab_3)
+            self.satici_categoryText.setGeometry(
+                QtCore.QRect(190, 370, 301, 31))
+            self.satici_categoryText.setObjectName("categoryText")
 
-        self.satici_ingredientsText = QtWidgets.QTextEdit(self.tab_3)
-        self.satici_ingredientsText.setGeometry(
-            QtCore.QRect(190, 410, 301, 31))
-        self.satici_ingredientsText.setObjectName("ingredientsText")
+            self.satici_ingredientsText = QtWidgets.QTextEdit(self.tab_3)
+            self.satici_ingredientsText.setGeometry(
+                QtCore.QRect(190, 410, 301, 31))
+            self.satici_ingredientsText.setObjectName("ingredientsText")
 
-        self.satici_productName = QtWidgets.QLabel(self.tab_3)
-        self.satici_productName.setGeometry(QtCore.QRect(60, 300, 101, 16))
-        self.satici_productName.setObjectName("productName")
+            self.satici_productName = QtWidgets.QLabel(self.tab_3)
+            self.satici_productName.setGeometry(QtCore.QRect(60, 300, 101, 16))
+            self.satici_productName.setObjectName("productName")
 
-        self.satici_productPrice = QtWidgets.QLabel(self.tab_3)
-        self.satici_productPrice.setGeometry(QtCore.QRect(60, 340, 101, 17))
-        self.satici_productPrice.setObjectName("productPrice")
+            self.satici_productPrice = QtWidgets.QLabel(self.tab_3)
+            self.satici_productPrice.setGeometry(
+                QtCore.QRect(60, 340, 101, 17))
+            self.satici_productPrice.setObjectName("productPrice")
 
-        self.satici_category = QtWidgets.QLabel(self.tab_3)
-        self.satici_category.setGeometry(QtCore.QRect(60, 380, 101, 17))
-        self.satici_category.setObjectName("category")
+            self.satici_category = QtWidgets.QLabel(self.tab_3)
+            self.satici_category.setGeometry(QtCore.QRect(60, 380, 101, 17))
+            self.satici_category.setObjectName("category")
 
-        self.satici_ingredients = QtWidgets.QLabel(self.tab_3)
-        self.satici_ingredients.setGeometry(QtCore.QRect(60, 420, 101, 17))
-        self.satici_ingredients.setObjectName("ingredients")
+            self.satici_ingredients = QtWidgets.QLabel(self.tab_3)
+            self.satici_ingredients.setGeometry(QtCore.QRect(60, 420, 101, 17))
+            self.satici_ingredients.setObjectName("ingredients")
 
-        self.satici_productImage = QtWidgets.QLabel(self.tab_3)
-        self.satici_productImage.setGeometry(QtCore.QRect(60, 460, 101, 17))
-        self.satici_productImage.setObjectName("productImage")
+            self.satici_productImage = QtWidgets.QLabel(self.tab_3)
+            self.satici_productImage.setGeometry(
+                QtCore.QRect(60, 460, 101, 17))
+            self.satici_productImage.setObjectName("productImage")
 
-        self.satici_imageOpenButton = QtWidgets.QPushButton(self.tab_3)
-        self.satici_imageOpenButton.setGeometry(QtCore.QRect(190, 450, 89, 25))
-        self.satici_imageOpenButton.setObjectName("imageOpenButton")
-        self.satici_imageOpenButton.clicked.connect(self.importInput)
+            self.satici_imageOpenButton = QtWidgets.QPushButton(self.tab_3)
+            self.satici_imageOpenButton.setGeometry(
+                QtCore.QRect(190, 450, 89, 25))
+            self.satici_imageOpenButton.setObjectName("imageOpenButton")
+            self.satici_imageOpenButton.clicked.connect(self.importInput)
 
-        self.satici_minPriceUpdate = QtWidgets.QLabel(self.tab_3)
-        self.satici_minPriceUpdate.setGeometry(QtCore.QRect(560, 50, 171, 31))
-        self.satici_minPriceUpdate.setObjectName("minPriceUpdate")
+            self.satici_minPriceUpdate = QtWidgets.QLabel(self.tab_3)
+            self.satici_minPriceUpdate.setGeometry(
+                QtCore.QRect(560, 50, 171, 31))
+            self.satici_minPriceUpdate.setObjectName("minPriceUpdate")
 
-        self.satici_minPriceUpdateText = QtWidgets.QTextEdit(self.tab_3)
-        self.satici_minPriceUpdateText.setGeometry(
-            QtCore.QRect(740, 50, 301, 31))
-        self.satici_minPriceUpdateText.setObjectName("minPriceUpdateText")
+            self.satici_minPriceUpdateText = QtWidgets.QTextEdit(self.tab_3)
+            self.satici_minPriceUpdateText.setGeometry(
+                QtCore.QRect(740, 50, 301, 31))
+            self.satici_minPriceUpdateText.setObjectName("minPriceUpdateText")
 
-        self.satici_minPriceUpdateButton = QtWidgets.QPushButton(self.tab_3)
-        self.satici_minPriceUpdateButton.setGeometry(
-            QtCore.QRect(1050, 50, 89, 25))
-        self.satici_minPriceUpdateButton.setObjectName("minPriceUpdateButton")
-        self.satici_minPriceUpdateButton.clicked.connect(
-            self.minFiyatGuncelleme)
+            self.satici_minPriceUpdateButton = QtWidgets.QPushButton(
+                self.tab_3)
+            self.satici_minPriceUpdateButton.setGeometry(
+                QtCore.QRect(1050, 50, 89, 25))
+            self.satici_minPriceUpdateButton.setObjectName(
+                "minPriceUpdateButton")
+            self.satici_minPriceUpdateButton.clicked.connect(
+                self.minFiyatGuncelleme)
 
-        self.satici_restAddressUpdate = QtWidgets.QLabel(self.tab_3)
-        self.satici_restAddressUpdate.setGeometry(
-            QtCore.QRect(560, 100, 171, 31))
-        self.satici_restAddressUpdate.setObjectName("restAddressUpdate")
+            self.satici_restAddressUpdate = QtWidgets.QLabel(self.tab_3)
+            self.satici_restAddressUpdate.setGeometry(
+                QtCore.QRect(560, 100, 171, 31))
+            self.satici_restAddressUpdate.setObjectName("restAddressUpdate")
 
-        self.satici_restAddressUpdateText = QtWidgets.QTextEdit(self.tab_3)
-        self.satici_restAddressUpdateText.setGeometry(
-            QtCore.QRect(740, 100, 301, 31))
-        self.satici_restAddressUpdateText.setObjectName(
-            "restAddressUpdateText")
+            self.satici_restAddressUpdateText = QtWidgets.QTextEdit(self.tab_3)
+            self.satici_restAddressUpdateText.setGeometry(
+                QtCore.QRect(740, 100, 301, 31))
+            self.satici_restAddressUpdateText.setObjectName(
+                "restAddressUpdateText")
 
-        self.satici_restAddressUpdateButton = QtWidgets.QPushButton(self.tab_3)
-        self.satici_restAddressUpdateButton.setGeometry(
-            QtCore.QRect(1050, 100, 89, 25))
-        self.satici_restAddressUpdateButton.setObjectName(
-            "restAddressUpdateButton")
-        self.satici_restAddressUpdateButton.clicked.connect(
-            self.restAddressGuncelleme)
+            self.satici_restAddressUpdateButton = QtWidgets.QPushButton(
+                self.tab_3)
+            self.satici_restAddressUpdateButton.setGeometry(
+                QtCore.QRect(1050, 100, 89, 25))
+            self.satici_restAddressUpdateButton.setObjectName(
+                "restAddressUpdateButton")
+            self.satici_restAddressUpdateButton.clicked.connect(
+                self.restAddressGuncelleme)
 
-        self.satici_restNameUpdate = QtWidgets.QLabel(self.tab_3)
-        self.satici_restNameUpdate.setGeometry(QtCore.QRect(560, 150, 171, 31))
-        self.satici_restNameUpdate.setObjectName("restNameUpdate")
+            self.satici_restNameUpdate = QtWidgets.QLabel(self.tab_3)
+            self.satici_restNameUpdate.setGeometry(
+                QtCore.QRect(560, 150, 171, 31))
+            self.satici_restNameUpdate.setObjectName("restNameUpdate")
 
-        self.satici_restNameUpdateText = QtWidgets.QTextEdit(self.tab_3)
-        self.satici_restNameUpdateText.setGeometry(
-            QtCore.QRect(740, 150, 301, 31))
-        self.satici_restNameUpdateText.setObjectName("restNameUpdateText")
+            self.satici_restNameUpdateText = QtWidgets.QTextEdit(self.tab_3)
+            self.satici_restNameUpdateText.setGeometry(
+                QtCore.QRect(740, 150, 301, 31))
+            self.satici_restNameUpdateText.setObjectName("restNameUpdateText")
 
-        self.satici_restNameUpdateButton = QtWidgets.QPushButton(self.tab_3)
-        self.satici_restNameUpdateButton.setGeometry(
-            QtCore.QRect(1050, 150, 89, 25))
-        self.satici_restNameUpdateButton.setObjectName("restNameUpdateButton")
-        self.satici_restNameUpdateButton.clicked.connect(
-            self.restIsmiGuncelleme)
+            self.satici_restNameUpdateButton = QtWidgets.QPushButton(
+                self.tab_3)
+            self.satici_restNameUpdateButton.setGeometry(
+                QtCore.QRect(1050, 150, 89, 25))
+            self.satici_restNameUpdateButton.setObjectName(
+                "restNameUpdateButton")
+            self.satici_restNameUpdateButton.clicked.connect(
+                self.restIsmiGuncelleme)
 
-        self.tabWidget.addTab(self.tab_3, "")  # adding tab_3 to tabWidget
+            self.tabWidget.addTab(self.tab_3, "")  # adding tab_3 to tabWidget
 # ---END OF TAB: SATICI
 # ---INIT TAB: PROFIL
-        self.tab_4 = QtWidgets.QWidget()  # tab_4 = Profil
-        self.tab_4.setObjectName("Profil")
+        if authInfo['type'] == 'customer':
+            self.tab_4 = QtWidgets.QWidget()  # tab_4 = Profil
+            self.tab_4.setObjectName("Profil")
 
-        self.profil_customerPasswordText = QtWidgets.QPlainTextEdit(self.tab_4)
-        self.profil_customerPasswordText.setGeometry(
-            QtCore.QRect(230, 80, 201, 41))
-        self.profil_customerPasswordText.setObjectName(
-            "profil_customerPasswordText")
+            self.profil_customerPasswordText = QtWidgets.QPlainTextEdit(
+                self.tab_4)
+            self.profil_customerPasswordText.setGeometry(
+                QtCore.QRect(230, 80, 201, 41))
+            self.profil_customerPasswordText.setObjectName(
+                "profil_customerPasswordText")
 
-        self.profil_customerPassword = QtWidgets.QLabel(self.tab_4)
-        self.profil_customerPassword.setGeometry(QtCore.QRect(50, 80, 181, 41))
-        self.profil_customerPassword.setObjectName("profil_customerPassword")
+            self.profil_customerPassword = QtWidgets.QLabel(self.tab_4)
+            self.profil_customerPassword.setGeometry(
+                QtCore.QRect(50, 80, 181, 41))
+            self.profil_customerPassword.setObjectName(
+                "profil_customerPassword")
 
-        self.profil_customerFnameText = QtWidgets.QPlainTextEdit(self.tab_4)
-        self.profil_customerFnameText.setGeometry(
-            QtCore.QRect(230, 140, 201, 41))
-        self.profil_customerFnameText.setObjectName("profil_customerFnameText")
+            self.profil_customerFnameText = QtWidgets.QPlainTextEdit(
+                self.tab_4)
+            self.profil_customerFnameText.setGeometry(
+                QtCore.QRect(230, 140, 201, 41))
+            self.profil_customerFnameText.setObjectName(
+                "profil_customerFnameText")
 
-        self.profil_customerFname = QtWidgets.QLabel(self.tab_4)
-        self.profil_customerFname.setGeometry(QtCore.QRect(50, 140, 181, 41))
-        self.profil_customerFname.setObjectName("profil_customerFname")
+            self.profil_customerFname = QtWidgets.QLabel(self.tab_4)
+            self.profil_customerFname.setGeometry(
+                QtCore.QRect(50, 140, 181, 41))
+            self.profil_customerFname.setObjectName("profil_customerFname")
 
-        self.profil_customerLnameText = QtWidgets.QPlainTextEdit(self.tab_4)
-        self.profil_customerLnameText.setGeometry(
-            QtCore.QRect(230, 200, 201, 41))
-        self.profil_customerLnameText.setObjectName("profil_customerLnameText")
+            self.profil_customerLnameText = QtWidgets.QPlainTextEdit(
+                self.tab_4)
+            self.profil_customerLnameText.setGeometry(
+                QtCore.QRect(230, 200, 201, 41))
+            self.profil_customerLnameText.setObjectName(
+                "profil_customerLnameText")
 
-        self.profil_customerLname = QtWidgets.QLabel(self.tab_4)
-        self.profil_customerLname.setGeometry(QtCore.QRect(50, 200, 181, 41))
-        self.profil_customerLname.setObjectName("profil_customerLname")
+            self.profil_customerLname = QtWidgets.QLabel(self.tab_4)
+            self.profil_customerLname.setGeometry(
+                QtCore.QRect(50, 200, 181, 41))
+            self.profil_customerLname.setObjectName("profil_customerLname")
 
-        self.profil_customerTelNoText = QtWidgets.QPlainTextEdit(self.tab_4)
-        self.profil_customerTelNoText.setGeometry(
-            QtCore.QRect(230, 260, 201, 41))
-        self.profil_customerTelNoText.setObjectName("profil_customerTelNoText")
+            self.profil_customerTelNoText = QtWidgets.QPlainTextEdit(
+                self.tab_4)
+            self.profil_customerTelNoText.setGeometry(
+                QtCore.QRect(230, 260, 201, 41))
+            self.profil_customerTelNoText.setObjectName(
+                "profil_customerTelNoText")
 
-        self.profil_customerTelNo = QtWidgets.QLabel(self.tab_4)
-        self.profil_customerTelNo.setGeometry(QtCore.QRect(50, 260, 181, 41))
-        self.profil_customerTelNo.setObjectName("profil_customerTelNo")
+            self.profil_customerTelNo = QtWidgets.QLabel(self.tab_4)
+            self.profil_customerTelNo.setGeometry(
+                QtCore.QRect(50, 260, 181, 41))
+            self.profil_customerTelNo.setObjectName("profil_customerTelNo")
 
-        self.profil_customerAddress = QtWidgets.QLabel(self.tab_4)
-        self.profil_customerAddress.setGeometry(QtCore.QRect(50, 320, 181, 41))
-        self.profil_customerAddress.setObjectName("profil_customerAddress")
+            self.profil_customerAddress = QtWidgets.QLabel(self.tab_4)
+            self.profil_customerAddress.setGeometry(
+                QtCore.QRect(50, 320, 181, 41))
+            self.profil_customerAddress.setObjectName("profil_customerAddress")
 
-        self.profil_customerAddressText = QtWidgets.QPlainTextEdit(self.tab_4)
-        self.profil_customerAddressText.setGeometry(
-            QtCore.QRect(230, 320, 201, 41))
-        self.profil_customerAddressText.setObjectName(
-            "profil_customerAddressText")
+            self.profil_customerAddressText = QtWidgets.QPlainTextEdit(
+                self.tab_4)
+            self.profil_customerAddressText.setGeometry(
+                QtCore.QRect(230, 320, 201, 41))
+            self.profil_customerAddressText.setObjectName(
+                "profil_customerAddressText")
 
-        self.bilgileriGuncelle = QtWidgets.QLabel(self.tab_4)
-        self.bilgileriGuncelle.setGeometry(QtCore.QRect(50, 20, 381, 31))
-        sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(
-            self.bilgileriGuncelle.sizePolicy().hasHeightForWidth())
-        self.bilgileriGuncelle.setSizePolicy(sizePolicy)
-        self.bilgileriGuncelle.setTextFormat(QtCore.Qt.AutoText)
-        self.bilgileriGuncelle.setObjectName("bilgileriGuncelle")
+            self.bilgileriGuncelle = QtWidgets.QLabel(self.tab_4)
+            self.bilgileriGuncelle.setGeometry(QtCore.QRect(50, 20, 381, 31))
+            sizePolicy = QtWidgets.QSizePolicy(
+                QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+            sizePolicy.setHorizontalStretch(0)
+            sizePolicy.setVerticalStretch(0)
+            sizePolicy.setHeightForWidth(
+                self.bilgileriGuncelle.sizePolicy().hasHeightForWidth())
+            self.bilgileriGuncelle.setSizePolicy(sizePolicy)
+            self.bilgileriGuncelle.setTextFormat(QtCore.Qt.AutoText)
+            self.bilgileriGuncelle.setObjectName("bilgileriGuncelle")
 
-        self.pushButton = QtWidgets.QPushButton(self.tab_4)
-        self.pushButton.setGeometry(QtCore.QRect(50, 390, 391, 61))
-        self.pushButton.setObjectName("pushButton")
+            self.pushButton = QtWidgets.QPushButton(self.tab_4)
+            self.pushButton.setGeometry(QtCore.QRect(50, 390, 391, 61))
+            self.pushButton.setObjectName("KAYDET")
 
-        self.tabWidget.addTab(self.tab_4, "")  # adding tab_4 to tabWidget
+            self.tabWidget.addTab(self.tab_4, "")  # adding tab_4 to tabWidget
 # ---END OF TAB: PROFIL
 
         self.horizontalLayout.addWidget(self.tabWidget)
@@ -729,6 +744,9 @@ class Ui_MainWindow(object):
         self.importImagePath = "NULL"
         self.saticiguncelleme = saticiUrunGuncelleme(grandparent=self)
 
+        self.pushButton.clicked.connect(
+            self.profilGuncelleme)  # BUTTONA BASILDIGINDA
+
     def showSaticiGuncelleme(self, productId):
         # sorgu(productId)
         global cur
@@ -744,9 +762,19 @@ class Ui_MainWindow(object):
         self.saticiguncelleme.ui.setFields(name, price, category, ingred)
         self.saticiguncelleme.show()
 
-    def profıleUpdate(self):
+    def profileUpdate(self):
+        # customer id yi getiremiyorum
+        global cur, authInfo
 
-        pass
+        cur.execute('SELECT * FROM customer WHERE id =\"' +
+                    str(authInfo['id'])+"\"")
+        result = cur.fetchall()
+        password = result[0][1]
+        fname = result[0][2]
+        lname = result[0][3]
+        telNo = result[0][4]
+        address = result[0][5]
+        self.profilSetFields(password, fname, lname, telNo, address)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -755,61 +783,56 @@ class Ui_MainWindow(object):
             self.tab), _translate("MainWindow", "Anasayfa"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(
             self.tab_2), _translate("MainWindow", "Admin"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(
-            self.tab_3), _translate("MainWindow", "Satici"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(
-            self.tab_4), _translate("MainWindow", "Profil"))
 
         # goksel ========================================================================================
-        self.satici_yemekler.setText(_translate("MainWindow", "Yemekler"))
-        self.satici_listeyeEkleButton.setText(
-            _translate("MainWindow", "Listeye Ekle"))
-        self.satici_productName.setText(_translate("MainWindow", "Yemek ismi"))
-        self.satici_productPrice.setText(
-            _translate("MainWindow", "Yemek Fiyati"))
-        self.satici_category.setText(_translate("MainWindow", "Kategori"))
-        self.satici_ingredients.setText(
-            _translate("MainWindow", "Icindekiler"))
-        self.satici_productImage.setText(
-            _translate("MainWindow", "Yemek Resmi"))
-        self.satici_imageOpenButton.setText(
-            _translate("MainWindow", "Dosya Ac"))
-        self.satici_minPriceUpdate.setText(
-            _translate("MainWindow", "Minimum Fiyat Guncelle"))
-        self.satici_minPriceUpdateButton.setText(
-            _translate("MainWindow", "Guncelle"))
-        self.satici_restAddressUpdate.setText(
-            _translate("MainWindow", "Restoran Adresi Guncelle"))
-        self.satici_restAddressUpdateButton.setText(
-            _translate("MainWindow", "Guncelle"))
-        self.satici_restNameUpdate.setText(
-            _translate("MainWindow", "Restoran ismi Guncelle"))
-        self.satici_restNameUpdateButton.setText(
-            _translate("MainWindow", "Guncelle"))
+        if authInfo['type'] == 'restaurant':
+            self.tabWidget.setTabText(self.tabWidget.indexOf(
+                self.tab_3), _translate("MainWindow", "Satici"))
+            self.satici_yemekler.setText(_translate("MainWindow", "Yemekler"))
+            self.satici_listeyeEkleButton.setText(
+                _translate("MainWindow", "Listeye Ekle"))
+            self.satici_productName.setText(
+                _translate("MainWindow", "Yemek ismi"))
+            self.satici_productPrice.setText(
+                _translate("MainWindow", "Yemek Fiyati"))
+            self.satici_category.setText(_translate("MainWindow", "Kategori"))
+            self.satici_ingredients.setText(
+                _translate("MainWindow", "Icindekiler"))
+            self.satici_productImage.setText(
+                _translate("MainWindow", "Yemek Resmi"))
+            self.satici_imageOpenButton.setText(
+                _translate("MainWindow", "Dosya Ac"))
+            self.satici_minPriceUpdate.setText(
+                _translate("MainWindow", "Minimum Fiyat Guncelle"))
+            self.satici_minPriceUpdateButton.setText(
+                _translate("MainWindow", "Guncelle"))
+            self.satici_restAddressUpdate.setText(
+                _translate("MainWindow", "Restoran Adresi Guncelle"))
+            self.satici_restAddressUpdateButton.setText(
+                _translate("MainWindow", "Guncelle"))
+            self.satici_restNameUpdate.setText(
+                _translate("MainWindow", "Restoran ismi Guncelle"))
+            self.satici_restNameUpdateButton.setText(
+                _translate("MainWindow", "Guncelle"))
 
         # Goksel PROFIL ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        self.profil_customerPasswordText.setPlainText(
-            _translate("MainWindow", "eeeeeeeeeeeeee"))
-        self.profil_customerPassword.setText(
-            _translate("MainWindow", "Kullanici Sifre"))
-        self.profil_customerFnameText.setPlainText(
-            _translate("MainWindow", "bbbbbbbbbbbbbbbbbbb"))
-        self.profil_customerFname.setText(
-            _translate("MainWindow", "Kullanici isim"))
-        self.profil_customerLnameText.setPlainText(
-            _translate("MainWindow", "xxxxxxxxxxxxxxxxx"))
-        self.profil_customerLname.setText(
-            _translate("MainWindow", "Kullanici Soyisim"))
-        self.profil_customerTelNoText.setPlainText(
-            _translate("MainWindow", "ddddddddddddddddddddddddd"))
-        self.profil_customerTelNo.setText(
-            _translate("MainWindow", "Telefon No"))
-        self.profil_customerAddress.setText(_translate("MainWindow", "Adres"))
-        self.profil_customerAddressText.setPlainText(
-            _translate("MainWindow", "yea"))
-        self.bilgileriGuncelle.setText(_translate(
-            "MainWindow", "KULLANICI BILGILERI GUNCELLEME"))
-        self.pushButton.setText(_translate("MainWindow", "KAYDET"))
+        if authInfo['type'] == 'customer':
+            self.tabWidget.setTabText(self.tabWidget.indexOf(
+                self.tab_4), _translate("MainWindow", "Profil"))
+            self.profil_customerPassword.setText(
+                _translate("MainWindow", "Kullanici Sifre"))
+            self.profil_customerFname.setText(
+                _translate("MainWindow", "Kullanici isim"))
+            self.profil_customerLname.setText(
+                _translate("MainWindow", "Kullanici Soyisim"))
+            self.profil_customerTelNo.setText(
+                _translate("MainWindow", "Telefon No"))
+            self.profil_customerAddress.setText(
+                _translate("MainWindow", "Adres"))
+            self.bilgileriGuncelle.setText(_translate(
+                "MainWindow", "KULLANICI BILGILERI GUNCELLEME"))
+            self.pushButton.setText(_translate("MainWindow", "KAYDET"))
+            self.profileUpdate()
 
     def importInput(self):
         imagepath = ''
@@ -873,6 +896,31 @@ class Ui_MainWindow(object):
         restAd = self.satici_restNameUpdateText.toPlainText()
         cur.execute('UPDATE restaurant SET name = \"' +
                     str(restAd)+'\" WHERE id = '+str(restId))
+        conn.commit()
+
+    def profilSetFields(self, password, fname, lname, telNo, address):
+        _translate = QtCore.QCoreApplication.translate
+        self.profil_customerPasswordText.setPlainText(
+            _translate("MainWindow", password))
+        self.profil_customerFnameText.setPlainText(
+            _translate("MainWindow", fname))
+        self.profil_customerLnameText.setPlainText(
+            _translate("MainWindow", lname))
+        self.profil_customerTelNoText.setPlainText(
+            _translate("MainWindow", str(telNo)))
+        self.profil_customerAddressText.setPlainText(
+            _translate("MainWindow", str(address)))
+
+    def profilGuncelleme(self):
+        global cur, conn, authInfo
+        profilpassword = self.profil_customerPasswordText.toPlainText()
+        profilFname = self.profil_customerFnameText.toPlainText()
+        profilLname = self.profil_customerLnameText.toPlainText()
+        profilTelNo = self.profil_customerTelNoText.toPlainText()
+        profilAddress = self.profil_customerAddressText.toPlainText()
+        # GUNCELLEME SORUGSU YAPIIYORUZ
+        cur.execute('UPDATE customer SET pass = \"'+str(profilpassword)+'\", fname = \"'+str(profilFname) +
+                    '\" , lname = \"'+str(profilLname)+'\", telNo = '+str(profilTelNo)+', address = \"'+str(profilAddress)+'\" WHERE id = \"' + str(authInfo['id']) + "\"")
         conn.commit()
 
         # goksel ==============================================================================================
