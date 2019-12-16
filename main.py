@@ -18,7 +18,7 @@ import sqlite3
 from random import randint
 
 authInfo = {
-    'id': 'thmyris',
+    'id': 'sasenka',
     'password': '54',
     'type': 'customer'
 }
@@ -723,6 +723,8 @@ class Ui_MainWindow(object):
             self.pushButton = QtWidgets.QPushButton(self.tab_4)
             self.pushButton.setGeometry(QtCore.QRect(50, 390, 391, 61))
             self.pushButton.setObjectName("KAYDET")
+            self.pushButton.clicked.connect(
+                self.profilGuncelleme)  # BUTTONA BASILDIGINDA
 
             self.tabWidget.addTab(self.tab_4, "")  # adding tab_4 to tabWidget
 # ---END OF TAB: PROFIL
@@ -743,9 +745,6 @@ class Ui_MainWindow(object):
         # goksel =========================================================================
         self.importImagePath = "NULL"
         self.saticiguncelleme = saticiUrunGuncelleme(grandparent=self)
-
-        self.pushButton.clicked.connect(
-            self.profilGuncelleme)  # BUTTONA BASILDIGINDA
 
     def showSaticiGuncelleme(self, productId):
         # sorgu(productId)
@@ -773,7 +772,12 @@ class Ui_MainWindow(object):
         fname = result[0][2]
         lname = result[0][3]
         telNo = result[0][4]
+        print(type(telNo))
+        if telNo is None:
+            telNo = ''
         address = result[0][5]
+        if address is None:
+            address = ''
         self.profilSetFields(password, fname, lname, telNo, address)
 
     def retranslateUi(self, MainWindow):
@@ -917,10 +921,17 @@ class Ui_MainWindow(object):
         profilFname = self.profil_customerFnameText.toPlainText()
         profilLname = self.profil_customerLnameText.toPlainText()
         profilTelNo = self.profil_customerTelNoText.toPlainText()
+        if profilTelNo == "":
+            profilTelNo = 'NULL'
         profilAddress = self.profil_customerAddressText.toPlainText()
+        if profilAddress == "":
+            profilAddress = 'NULL'
+            cur.execute('UPDATE customer SET pass = \"'+str(profilpassword)+'\", fname = \"'+str(profilFname) +
+                        '\" , lname = \"'+str(profilLname)+'\", telNo = '+str(profilTelNo)+', address = '+str(profilAddress)+' WHERE id = \"' + str(authInfo['id']) + "\"")
         # GUNCELLEME SORUGSU YAPIIYORUZ
-        cur.execute('UPDATE customer SET pass = \"'+str(profilpassword)+'\", fname = \"'+str(profilFname) +
-                    '\" , lname = \"'+str(profilLname)+'\", telNo = '+str(profilTelNo)+', address = \"'+str(profilAddress)+'\" WHERE id = \"' + str(authInfo['id']) + "\"")
+        else:
+            cur.execute('UPDATE customer SET pass = \"'+str(profilpassword)+'\", fname = \"'+str(profilFname) +
+                        '\" , lname = \"'+str(profilLname)+'\", telNo = '+str(profilTelNo)+', address = \"'+str(profilAddress)+'\" WHERE id = \"' + str(authInfo['id']) + "\"")
         conn.commit()
 
         # goksel ==============================================================================================
