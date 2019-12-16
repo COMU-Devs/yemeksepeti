@@ -128,8 +128,8 @@ class menuQWidget(QListWidget):
     def listProducts(self, restaurantId):
         self.clear()
         global cur
-        cur.execute('SELECT * FROM product WHERE r_id=' +
-                    str(restaurantId))
+        cur.execute('SELECT * FROM product WHERE r_id='
+                    + str(restaurantId))
         result = cur.fetchall()
         for row in result:
             item = QListWidgetItem(self)
@@ -186,8 +186,8 @@ class sepetQWidget(QListWidget):
         global conn, cur, authInfo
         # eger bos sepet varsa id o sepetin id sini dondur
         # yoksa bos bir sepet olustur ve id sini dondur
-        cur.execute('SELECT id FROM order_table WHERE cus_id = \"' +
-                    str(authInfo['id']) + '\" and purchase_date is NULL')
+        cur.execute('SELECT id FROM order_table WHERE cus_id = \"'
+                    + str(authInfo['id']) + '\" and purchase_date is NULL')
         result = cur.fetchall()
         if len(result) == 1:
             orderId = result[0][0]
@@ -195,14 +195,14 @@ class sepetQWidget(QListWidget):
 
         else:
             # insert new record with date = NULL
-            cur.execute("INSERT INTO order_table(id, purchase_date, cus_id)" +
-                        "VALUES( NULL, NULL, \"" + str(authInfo['id']) + "\")"
+            cur.execute("INSERT INTO order_table(id, purchase_date, cus_id)"
+                        + "VALUES( NULL, NULL, \"" + str(authInfo['id']) + "\")"
                         )
 
             conn.commit()
 
-            cur.execute('SELECT id FROM order_table WHERE cus_id = \"' +
-                        str(authInfo['id']) + '\" and purchase_date is NULL LIMIT 1')
+            cur.execute('SELECT id FROM order_table WHERE cus_id = \"'
+                        + str(authInfo['id']) + '\" and purchase_date is NULL LIMIT 1')
 
             orderId = cur.fetchall()[0]
             return orderId
@@ -225,8 +225,8 @@ class sepetQWidget(QListWidget):
         x, y, z, t = str(randint(0, 99999999)), randint(
             0, 99999999), name, randint(0, 99999999)
         cur.execute(
-            "INSERT INTO order_line(pname,pnumber,plocation,dnum)" +
-            f"VALUES('{x}', '{y}', '{z}', '{t}')"
+            "INSERT INTO order_line(pname,pnumber,plocation,dnum)"
+            + f"VALUES('{x}', '{y}', '{z}', '{t}')"
         )
 
         # self.listSepetItems()
@@ -287,6 +287,7 @@ class adminRestaurantBoxQWidget(QListWidget):
 
     def listRestaurants(self):
         global cur
+        self.clear()
         cur.execute('SELECT * FROM restaurant')
         result = cur.fetchall()
         for row in (result):
@@ -297,6 +298,14 @@ class adminRestaurantBoxQWidget(QListWidget):
             self.addItem(item)
             self.setItemWidget(item, item_widget)
 
+    def adminListedenCikar(self, travellingrestid):
+        global cur, conn
+        cur.execute(
+            "DELETE FROM restaurant WHERE id =" + travellingrestid
+        )
+        conn.commit()
+        self.listRestaurants()
+
 
 # TODO admin/restorantablosulistesi ne donusturulecek. restaurantQWidget in kopyasiydi.
 class adminRestaurantBoxItemQWidget(QWidget):
@@ -305,8 +314,7 @@ class adminRestaurantBoxItemQWidget(QWidget):
         self.parent = parent
         self.values = row
 
-        restaurantId = self.values[0]
-        restId, restPass, name, address, minPayment = self.values[0:]
+        restId, restPass, name, address, minPayment = self.values
 
         self.restIdLabel = QLabel(str(restId))
         self.restPassLabel = QLabel(str(restPass))
@@ -315,8 +323,8 @@ class adminRestaurantBoxItemQWidget(QWidget):
         self.minPaymentLabel = QLabel(str(minPayment))
         self.buttonSelect = QPushButton("Düzenle")
         self.buttonDelete = QPushButton("Sil")
-        self.buttonDelete.setFixedSize(40,30)
-        self.buttonSelect.setFixedSize(70,30)
+        self.buttonDelete.setFixedSize(40, 30)
+        self.buttonSelect.setFixedSize(70, 30)
 
         self.vLayout = QVBoxLayout()
         self.hLayout = QHBoxLayout()
@@ -327,13 +335,13 @@ class adminRestaurantBoxItemQWidget(QWidget):
         self.hLayout.addWidget(self.minPaymentLabel)
         self.hLayout.addWidget(self.buttonDelete)
         self.hLayout.addWidget(self.buttonSelect)
-        #self.hLayout.addLayout(self.vLayout)
+        # self.hLayout.addLayout(self.vLayout)
         self.setLayout(self.hLayout)
 
         self.buttonSelect.clicked.connect(
             lambda: self.parent.listProducts(restaurantId=restaurantId))
         self.buttonDelete.clicked.connect(
-            lambda: self.parent.listProducts(restaurantId=restaurantId))
+            lambda: self.parent.adminListedenCikar(travellingrestid=restId))
 
 
 class Ui_MainWindow(object):
@@ -460,6 +468,7 @@ class Ui_MainWindow(object):
         self.adminOnayla1 = QtWidgets.QPushButton(self.tab_2)
         self.adminOnayla1.setGeometry(QtCore.QRect(953, 385, 93, 28))
         self.adminOnayla1.setObjectName("adminOnayla1")
+        self.adminOnayla1.clicked.connect(self.adminListeyeEkle)
         self.adminGuncelleLabel = QtWidgets.QLabel(self.tab_2)
         self.adminGuncelleLabel.setGeometry(QtCore.QRect(34, 420, 191, 31))
         font = QtGui.QFont()
@@ -649,6 +658,54 @@ class Ui_MainWindow(object):
         self.adminSeciliRestLabel.setText(
             _translate("MainWindow", "(Secili Restoran:"))
         # --END FARUK RETRANSLATE
+
+    # --- INIT FARUK BUTTON HANDLING
+    def adminListeyeEkle(self):
+        global cur, conn, authInfo
+
+        ekleid = self.adminPlainTextEdit.toPlainText()
+        eklepass = self.adminPlainTextEdit_2.toPlainText()
+        ekleisim = self.adminPlainTextEdit_4.toPlainText()
+        ekleadres = self.adminPlainTextEdit_3.toPlainText()
+        eklesinir = self.adminPlainTextEdit_5.toPlainText()
+
+        myid = authInfo['id']
+        cur.execute(  # BUG burda hata veriyor
+            "INSERT INTO restaurant(id,pass,name,address,min_pay)"
+            + f"VALUES('{ekleid}','{eklepass}','{ekleisim}','{ekleadres}', '{eklesinir}')"
+        )
+        conn.commit()
+        self.adminRestaurantBox.listRestaurants()
+
+
+    # TODO gokselin showSaticiGuncelleme, bunu adminRestoranLabelDoldur a cevir, secilirestoran: labelini sil
+    def showSaticiGuncelleme(self, travelingrestid):
+        global cur, conn
+        cur.execute(
+            'SELECT * FROM restaurant WHERE id =' + str(travellingrestid)
+        )
+        result = cur.fetchall()
+        restid = result[0][0]
+        print(result[0][0])
+        restpass = result[0][1]
+        restname = result[0][2]
+        restaddr = result[0][3]
+        restminpay = result[0][4]
+        self.adminSetFields(restid, restpass, restname, restaddr, restminpay)
+        self.adminRestaurantBox.listRestaurants()
+
+    # TODO gokselin setfields kendiminkine cevrilcek
+    def adminSetFields(self, restid2, restpass2, restname2, restaddr2, restminpay2):
+        _translate = QtCore.QCoreApplication.translate
+        self.adminPlainTextEdit_7.setPlainText(
+            _translate("Form", restid2))
+        self.adminPlainTextEdit_10.setPlainText(_translate("Form", restpass2))
+        self.adminPlainTextEdit_8.setPlainText(_translate("Form", restname2))
+        self.adminPlainTextEdit_9.setPlainText(_translate("Form", restaddr2))
+        self.adminPlainTextEdit_6.setPlainText(
+            _translate("Form", str(restminpay2)))
+
+    # --- END FARUK BUTTON HANDLING
 
 
 if __name__ == "__main__":
