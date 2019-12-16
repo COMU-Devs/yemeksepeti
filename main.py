@@ -22,7 +22,7 @@ authInfo = {
     'type': 'customer'
 }
 
-
+adminRestId= -10
 conn = sqlite3.connect('yemeksepeti.db')
 cur = conn.cursor()
 
@@ -111,9 +111,9 @@ class menuQWidget(QListWidget):
     def __init__(self, parent=None, grandparent=None):
         QListWidget.__init__(self, parent)
         self.grandparent = grandparent
-        self.listRestaurants()
+        self.huehuehue()
 
-    def listRestaurants(self):
+    def huehuehue(self):
         global cur
         cur.execute('SELECT * FROM restaurant')
         result = cur.fetchall()
@@ -128,8 +128,8 @@ class menuQWidget(QListWidget):
     def listProducts(self, restaurantId):
         self.clear()
         global cur
-        cur.execute('SELECT * FROM product WHERE r_id='
-                    + str(restaurantId))
+        cur.execute('SELECT * FROM product WHERE r_id=' +
+                    str(restaurantId))
         result = cur.fetchall()
         for row in result:
             item = QListWidgetItem(self)
@@ -186,8 +186,8 @@ class sepetQWidget(QListWidget):
         global conn, cur, authInfo
         # eger bos sepet varsa id o sepetin id sini dondur
         # yoksa bos bir sepet olustur ve id sini dondur
-        cur.execute('SELECT id FROM order_table WHERE cus_id = \"'
-                    + str(authInfo['id']) + '\" and purchase_date is NULL')
+        cur.execute('SELECT id FROM order_table WHERE cus_id = \"' +
+                    str(authInfo['id']) + '\" and purchase_date is NULL')
         result = cur.fetchall()
         if len(result) == 1:
             orderId = result[0][0]
@@ -195,14 +195,14 @@ class sepetQWidget(QListWidget):
 
         else:
             # insert new record with date = NULL
-            cur.execute("INSERT INTO order_table(id, purchase_date, cus_id)"
-                        + "VALUES( NULL, NULL, \"" + str(authInfo['id']) + "\")"
+            cur.execute("INSERT INTO order_table(id, purchase_date, cus_id)" +
+                        "VALUES( NULL, NULL, \"" + str(authInfo['id']) + "\")"
                         )
 
             conn.commit()
 
-            cur.execute('SELECT id FROM order_table WHERE cus_id = \"'
-                        + str(authInfo['id']) + '\" and purchase_date is NULL LIMIT 1')
+            cur.execute('SELECT id FROM order_table WHERE cus_id = \"' +
+                        str(authInfo['id']) + '\" and purchase_date is NULL LIMIT 1')
 
             orderId = cur.fetchall()[0]
             return orderId
@@ -225,8 +225,8 @@ class sepetQWidget(QListWidget):
         x, y, z, t = str(randint(0, 99999999)), randint(
             0, 99999999), name, randint(0, 99999999)
         cur.execute(
-            "INSERT INTO order_line(pname,pnumber,plocation,dnum)"
-            + f"VALUES('{x}', '{y}', '{z}', '{t}')"
+            "INSERT INTO order_line(pname,pnumber,plocation,dnum)" +
+            f"VALUES('{x}', '{y}', '{z}', '{t}')"
         )
 
         # self.listSepetItems()
@@ -278,14 +278,15 @@ class orderQWidget(QListWidget):
             self.setItemWidget(item, item_widget)
 
 
-# TODO admin/restorantablosubox na donusturulecek. menuQWidget in kopyasiydi.
+# TODO FARUK:admin/restorantablosubox na donusturulecek. menuQWidget in kopyasiydi.
 class adminRestaurantBoxQWidget(QListWidget):
     def __init__(self, parent=None, grandparent=None):
         QListWidget.__init__(self, parent)
         self.grandparent = grandparent
-        self.listRestaurants()
+        self.SUPERrestid = -1
+        self.adminListRestaurants()
 
-    def listRestaurants(self):
+    def adminListRestaurants(self):
         global cur
         self.clear()
         cur.execute('SELECT * FROM restaurant')
@@ -304,7 +305,23 @@ class adminRestaurantBoxQWidget(QListWidget):
             "DELETE FROM restaurant WHERE id =" + travellingrestid
         )
         conn.commit()
-        self.listRestaurants()
+        self.adminListRestaurants()
+
+    # TODO gokselin showSaticiGuncelleme, bunu adminRestoranGuncelleLabelBilgisiCek a cevir, secilirestoran: labelini sil?
+    def adminRestoranGuncelleLabelBilgisiCek(self, travellingrestid2):
+        global cur, conn
+        cur.execute(
+            'SELECT * FROM restaurant WHERE id =' + str(travellingrestid2)
+        )
+        result = cur.fetchall()
+        self.SUPERrestid = result[0][0] #bunu self yapma sebebim ui icindeki onayla2clickeventhandlerin bu degiskene erisip adminsqlguncelle fonkuna degisken olarak gonderebilmesi
+        restpass = result[0][1]
+        restname = result[0][2]
+        restaddr = result[0][3]
+        restminpay = result[0][4]
+        self.grandparent.adminRestoranGuncelleLabelBilgisiDoldur(
+            self.SUPERrestid, restpass, restname, restaddr, restminpay)
+        self.adminListRestaurants()
 
 
 # TODO admin/restorantablosulistesi ne donusturulecek. restaurantQWidget in kopyasiydi.
@@ -339,7 +356,7 @@ class adminRestaurantBoxItemQWidget(QWidget):
         self.setLayout(self.hLayout)
 
         self.buttonSelect.clicked.connect(
-            lambda: self.parent.listProducts(restaurantId=restaurantId))
+            lambda: self.parent.adminRestoranGuncelleLabelBilgisiCek(travellingrestid2=restId))
         self.buttonDelete.clicked.connect(
             lambda: self.parent.adminListedenCikar(travellingrestid=restId))
 
@@ -553,6 +570,7 @@ class Ui_MainWindow(object):
         self.adminOnayla2 = QtWidgets.QPushButton(self.tab_2)
         self.adminOnayla2.setGeometry(QtCore.QRect(954, 495, 93, 28))
         self.adminOnayla2.setObjectName("adminOnayla2")
+        self.adminOnayla2.clicked.connect(self.adminSQLGuncelle)
         self.adminId0 = QtWidgets.QLabel(self.tab_2)
         self.adminId0.setGeometry(QtCore.QRect(38, 15, 31, 31))
         font = QtGui.QFont()
@@ -583,12 +601,6 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.adminOdeme0.setFont(font)
         self.adminOdeme0.setObjectName("adminOdeme0")
-        self.adminSeciliRestLabel = QtWidgets.QLabel(self.tab_2)
-        self.adminSeciliRestLabel.setGeometry(QtCore.QRect(260, 420, 491, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.adminSeciliRestLabel.setFont(font)
-        self.adminSeciliRestLabel.setObjectName("adminSeciliRestLabel")
 
         self.tabWidget.addTab(self.tab_2, "")  # adding tab_2 to tabWidget
         # ---END OF TAB: ADMIN
@@ -655,8 +667,6 @@ class Ui_MainWindow(object):
         self.adminIsim0.setText(_translate("MainWindow", "NAME"))
         self.adminAdres0.setText(_translate("MainWindow", "ADDRESS"))
         self.adminOdeme0.setText(_translate("MainWindow", "MIN_PAY"))
-        self.adminSeciliRestLabel.setText(
-            _translate("MainWindow", "(Secili Restoran:"))
         # --END FARUK RETRANSLATE
 
     # --- INIT FARUK BUTTON HANDLING
@@ -670,32 +680,31 @@ class Ui_MainWindow(object):
         eklesinir = self.adminPlainTextEdit_5.toPlainText()
 
         myid = authInfo['id']
-        cur.execute(  # BUG burda hata veriyor
-            "INSERT INTO restaurant(id,pass,name,address,min_pay)"
-            + f"VALUES('{ekleid}','{eklepass}','{ekleisim}','{ekleadres}', '{eklesinir}')"
+        cur.execute(
+            "INSERT INTO restaurant(id,pass,name,address,min_pay)" +
+            f"VALUES('{ekleid}','{eklepass}','{ekleisim}','{ekleadres}', '{eklesinir}')"
         )
         conn.commit()
-        self.adminRestaurantBox.listRestaurants()
+        self.adminRestaurantBox.adminListRestaurants()
 
+    # TODO FARUK: adminListeyeEkle fonkumdu, adminSQLGuncelle olcak.
+    def adminSQLGuncelle(self):
+        global cur, conn, authInfo
+        gelenid= self.adminRestaurantBox.SUPERrestid
+        updateid = self.adminPlainTextEdit_7.toPlainText()
+        updatepass = self.adminPlainTextEdit_10.toPlainText()
+        updatename = self.adminPlainTextEdit_8.toPlainText()
+        updateaddress = self.adminPlainTextEdit_9.toPlainText()
+        updateminpay = self.adminPlainTextEdit_6.toPlainText()
 
-    # TODO gokselin showSaticiGuncelleme, bunu adminRestoranLabelDoldur a cevir, secilirestoran: labelini sil
-    def showSaticiGuncelleme(self, travelingrestid):
-        global cur, conn
-        cur.execute(
-            'SELECT * FROM restaurant WHERE id =' + str(travellingrestid)
-        )
-        result = cur.fetchall()
-        restid = result[0][0]
-        print(result[0][0])
-        restpass = result[0][1]
-        restname = result[0][2]
-        restaddr = result[0][3]
-        restminpay = result[0][4]
-        self.adminSetFields(restid, restpass, restname, restaddr, restminpay)
-        self.adminRestaurantBox.listRestaurants()
+        myid = authInfo['id']
+        cur.execute('UPDATE restaurant SET id = \"'+str(updateid)+'\", pass = \"' + str(updatepass) + '\", name = \"' + str(
+            updatename) + '\", address = \"' + str(updateaddress) + '\" , min_pay = \"' + str(updateminpay) + '\" WHERE id = \"'+str(gelenid)+'\"')
+        conn.commit()
+        self.adminRestaurantBox.adminListRestaurants()
 
     # TODO gokselin setfields kendiminkine cevrilcek
-    def adminSetFields(self, restid2, restpass2, restname2, restaddr2, restminpay2):
+    def adminRestoranGuncelleLabelBilgisiDoldur(self, restid2, restpass2, restname2, restaddr2, restminpay2):
         _translate = QtCore.QCoreApplication.translate
         self.adminPlainTextEdit_7.setPlainText(
             _translate("Form", restid2))
