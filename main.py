@@ -22,7 +22,6 @@ authInfo = {
     'type': 'customer'
 }
 
-adminRestId= -10
 conn = sqlite3.connect('yemeksepeti.db')
 cur = conn.cursor()
 
@@ -153,7 +152,7 @@ class sepetItemQWidget(QWidget):
 
         self.hLayout = QHBoxLayout()
         self.vLayout = QVBoxLayout()
-        # TODO: buttonIncrease, buttonDecrease olarak degistirilir mi bu button degisken isimleri?
+
         self.button = QPushButton("+")
         self.button2 = QPushButton('-')
 
@@ -278,7 +277,7 @@ class orderQWidget(QListWidget):
             self.setItemWidget(item, item_widget)
 
 
-# TODO FARUK:admin/restorantablosubox na donusturulecek. menuQWidget in kopyasiydi.
+# NOTE FARUK:admin/restorantablosubox na donusturulecek. menuQWidget in kopyasiydi.
 class adminRestaurantBoxQWidget(QListWidget):
     def __init__(self, parent=None, grandparent=None):
         QListWidget.__init__(self, parent)
@@ -307,14 +306,14 @@ class adminRestaurantBoxQWidget(QListWidget):
         conn.commit()
         self.adminListRestaurants()
 
-    # TODO gokselin showSaticiGuncelleme, bunu adminRestoranGuncelleLabelBilgisiCek a cevir, secilirestoran: labelini sil?
     def adminRestoranGuncelleLabelBilgisiCek(self, travellingrestid2):
         global cur, conn
         cur.execute(
             'SELECT * FROM restaurant WHERE id =' + str(travellingrestid2)
         )
         result = cur.fetchall()
-        self.SUPERrestid = result[0][0] #bunu self yapma sebebim ui icindeki onayla2clickeventhandlerin bu degiskene erisip adminsqlguncelle fonkuna degisken olarak gonderebilmesi
+        # bunu self yapma sebebim ui icindeki onayla2clickeventhandlerin bu degiskene erisip adminsqlguncelle fonkuna degisken olarak gonderebilmesi
+        self.SUPERrestid = result[0][0]
         restpass = result[0][1]
         restname = result[0][2]
         restaddr = result[0][3]
@@ -324,7 +323,7 @@ class adminRestaurantBoxQWidget(QListWidget):
         self.adminListRestaurants()
 
 
-# TODO admin/restorantablosulistesi ne donusturulecek. restaurantQWidget in kopyasiydi.
+# NOTE FARUK:admin/restorantablosulistesi ne donusturulecek. restaurantQWidget in kopyasiydi.
 class adminRestaurantBoxItemQWidget(QWidget):
     def __init__(self, row, parent=None):
         super(adminRestaurantBoxItemQWidget, self).__init__(parent)
@@ -413,50 +412,35 @@ class Ui_MainWindow(object):
         font.setPointSize(10)
         self.adminId1.setFont(font)
         self.adminId1.setObjectName("adminId1")
-        self.adminPlainTextEdit = QtWidgets.QPlainTextEdit(self.tab_2)
+        self.adminPlainTextEdit = QtWidgets.QLineEdit(self.tab_2)
         self.adminPlainTextEdit.setGeometry(QtCore.QRect(57, 345, 51, 31))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.adminPlainTextEdit.setFont(font)
-        self.adminPlainTextEdit.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarAlwaysOff)
-        self.adminPlainTextEdit.setPlainText("")
         self.adminPlainTextEdit.setObjectName("adminPlainTextEdit")
-        self.adminPlainTextEdit_2 = QtWidgets.QPlainTextEdit(self.tab_2)
+        self.adminPlainTextEdit_2 = QtWidgets.QLineEdit(self.tab_2)
         self.adminPlainTextEdit_2.setGeometry(QtCore.QRect(156, 345, 81, 31))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.adminPlainTextEdit_2.setFont(font)
-        self.adminPlainTextEdit_2.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarAlwaysOff)
-        self.adminPlainTextEdit_2.setPlainText("")
         self.adminPlainTextEdit_2.setObjectName("adminPlainTextEdit_2")
-        self.adminPlainTextEdit_3 = QtWidgets.QPlainTextEdit(self.tab_2)
+        self.adminPlainTextEdit_3 = QtWidgets.QLineEdit(self.tab_2)
         self.adminPlainTextEdit_3.setGeometry(QtCore.QRect(563, 345, 291, 31))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.adminPlainTextEdit_3.setFont(font)
-        self.adminPlainTextEdit_3.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarAlwaysOff)
-        self.adminPlainTextEdit_3.setPlainText("")
         self.adminPlainTextEdit_3.setObjectName("adminPlainTextEdit_3")
-        self.adminPlainTextEdit_4 = QtWidgets.QPlainTextEdit(self.tab_2)
+        self.adminPlainTextEdit_4 = QtWidgets.QLineEdit(self.tab_2)
         self.adminPlainTextEdit_4.setGeometry(QtCore.QRect(293, 345, 211, 31))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.adminPlainTextEdit_4.setFont(font)
-        self.adminPlainTextEdit_4.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarAlwaysOff)
-        self.adminPlainTextEdit_4.setPlainText("")
         self.adminPlainTextEdit_4.setObjectName("adminPlainTextEdit_4")
-        self.adminPlainTextEdit_5 = QtWidgets.QPlainTextEdit(self.tab_2)
+        self.adminPlainTextEdit_5 = QtWidgets.QLineEdit(self.tab_2)
         self.adminPlainTextEdit_5.setGeometry(QtCore.QRect(993, 345, 51, 31))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.adminPlainTextEdit_5.setFont(font)
-        self.adminPlainTextEdit_5.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarAlwaysOff)
-        self.adminPlainTextEdit_5.setPlainText("")
         self.adminPlainTextEdit_5.setObjectName("adminPlainTextEdit_5")
         self.adminPass1 = QtWidgets.QLabel(self.tab_2)
         self.adminPass1.setGeometry(QtCore.QRect(113, 351, 51, 21))
@@ -492,14 +476,11 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.adminGuncelleLabel.setFont(font)
         self.adminGuncelleLabel.setObjectName("adminGuncelleLabel")
-        self.adminPlainTextEdit_6 = QtWidgets.QPlainTextEdit(self.tab_2)
+        self.adminPlainTextEdit_6 = QtWidgets.QLineEdit(self.tab_2)
         self.adminPlainTextEdit_6.setGeometry(QtCore.QRect(994, 455, 51, 31))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.adminPlainTextEdit_6.setFont(font)
-        self.adminPlainTextEdit_6.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarAlwaysOff)
-        self.adminPlainTextEdit_6.setPlainText("")
         self.adminPlainTextEdit_6.setObjectName("adminPlainTextEdit_6")
         self.adminOdeme2 = QtWidgets.QLabel(self.tab_2)
         self.adminOdeme2.setGeometry(QtCore.QRect(864, 455, 131, 31))
@@ -513,41 +494,29 @@ class Ui_MainWindow(object):
         font.setPointSize(10)
         self.adminId2.setFont(font)
         self.adminId2.setObjectName("adminId2")
-        self.adminPlainTextEdit_7 = QtWidgets.QPlainTextEdit(self.tab_2)
+        self.adminPlainTextEdit_7 = QtWidgets.QLineEdit(self.tab_2)
         self.adminPlainTextEdit_7.setGeometry(QtCore.QRect(57, 455, 51, 31))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.adminPlainTextEdit_7.setFont(font)
-        self.adminPlainTextEdit_7.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarAlwaysOff)
-        self.adminPlainTextEdit_7.setPlainText("")
         self.adminPlainTextEdit_7.setObjectName("adminPlainTextEdit_7")
-        self.adminPlainTextEdit_8 = QtWidgets.QPlainTextEdit(self.tab_2)
+        self.adminPlainTextEdit_8 = QtWidgets.QLineEdit(self.tab_2)
         self.adminPlainTextEdit_8.setGeometry(QtCore.QRect(294, 455, 211, 31))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.adminPlainTextEdit_8.setFont(font)
-        self.adminPlainTextEdit_8.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarAlwaysOff)
-        self.adminPlainTextEdit_8.setPlainText("")
         self.adminPlainTextEdit_8.setObjectName("adminPlainTextEdit_8")
-        self.adminPlainTextEdit_9 = QtWidgets.QPlainTextEdit(self.tab_2)
+        self.adminPlainTextEdit_9 = QtWidgets.QLineEdit(self.tab_2)
         self.adminPlainTextEdit_9.setGeometry(QtCore.QRect(564, 455, 291, 31))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.adminPlainTextEdit_9.setFont(font)
-        self.adminPlainTextEdit_9.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarAlwaysOff)
-        self.adminPlainTextEdit_9.setPlainText("")
         self.adminPlainTextEdit_9.setObjectName("adminPlainTextEdit_9")
-        self.adminPlainTextEdit_10 = QtWidgets.QPlainTextEdit(self.tab_2)
+        self.adminPlainTextEdit_10 = QtWidgets.QLineEdit(self.tab_2)
         self.adminPlainTextEdit_10.setGeometry(QtCore.QRect(157, 455, 81, 31))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.adminPlainTextEdit_10.setFont(font)
-        self.adminPlainTextEdit_10.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarAlwaysOff)
-        self.adminPlainTextEdit_10.setPlainText("")
         self.adminPlainTextEdit_10.setObjectName("adminPlainTextEdit_10")
         self.adminIsim2 = QtWidgets.QLabel(self.tab_2)
         self.adminIsim2.setGeometry(QtCore.QRect(254, 465, 41, 16))
@@ -673,11 +642,11 @@ class Ui_MainWindow(object):
     def adminListeyeEkle(self):
         global cur, conn, authInfo
 
-        ekleid = self.adminPlainTextEdit.toPlainText()
-        eklepass = self.adminPlainTextEdit_2.toPlainText()
-        ekleisim = self.adminPlainTextEdit_4.toPlainText()
-        ekleadres = self.adminPlainTextEdit_3.toPlainText()
-        eklesinir = self.adminPlainTextEdit_5.toPlainText()
+        ekleid = self.adminPlainTextEdit.text()
+        eklepass = self.adminPlainTextEdit_2.text()
+        ekleisim = self.adminPlainTextEdit_4.text()
+        ekleadres = self.adminPlainTextEdit_3.text()
+        eklesinir = self.adminPlainTextEdit_5.text()
 
         myid = authInfo['id']
         cur.execute(
@@ -687,31 +656,35 @@ class Ui_MainWindow(object):
         conn.commit()
         self.adminRestaurantBox.adminListRestaurants()
 
-    # TODO FARUK: adminListeyeEkle fonkumdu, adminSQLGuncelle olcak.
     def adminSQLGuncelle(self):
         global cur, conn, authInfo
-        gelenid= self.adminRestaurantBox.SUPERrestid
-        updateid = self.adminPlainTextEdit_7.toPlainText()
-        updatepass = self.adminPlainTextEdit_10.toPlainText()
-        updatename = self.adminPlainTextEdit_8.toPlainText()
-        updateaddress = self.adminPlainTextEdit_9.toPlainText()
-        updateminpay = self.adminPlainTextEdit_6.toPlainText()
+        gelenid = self.adminRestaurantBox.SUPERrestid
+        updateid = self.adminPlainTextEdit_7.text()
+        updatepass = self.adminPlainTextEdit_10.text()
+        updatename = self.adminPlainTextEdit_8.text()
+        updateaddress = self.adminPlainTextEdit_9.text()
+        updateminpay = self.adminPlainTextEdit_6.text()
 
         myid = authInfo['id']
-        cur.execute('UPDATE restaurant SET id = \"'+str(updateid)+'\", pass = \"' + str(updatepass) + '\", name = \"' + str(
-            updatename) + '\", address = \"' + str(updateaddress) + '\" , min_pay = \"' + str(updateminpay) + '\" WHERE id = \"'+str(gelenid)+'\"')
+        cur.execute('UPDATE restaurant SET id = \"' + str(updateid) + '\", pass = \"' + str(updatepass) + '\", name = \"' + str(
+            updatename) + '\", address = \"' + str(updateaddress) + '\" , min_pay = \"' + str(updateminpay) + '\" WHERE id = \"' + str(gelenid) + '\"')
         conn.commit()
         self.adminRestaurantBox.adminListRestaurants()
 
-    # TODO gokselin setfields kendiminkine cevrilcek
+        self.adminPlainTextEdit_7.setText("")
+        self.adminPlainTextEdit_10.setText("")
+        self.adminPlainTextEdit_8.setText("")
+        self.adminPlainTextEdit_9.setText("")
+        self.adminPlainTextEdit_6.setText("")
+
     def adminRestoranGuncelleLabelBilgisiDoldur(self, restid2, restpass2, restname2, restaddr2, restminpay2):
         _translate = QtCore.QCoreApplication.translate
-        self.adminPlainTextEdit_7.setPlainText(
+        self.adminPlainTextEdit_7.setText(
             _translate("Form", restid2))
-        self.adminPlainTextEdit_10.setPlainText(_translate("Form", restpass2))
-        self.adminPlainTextEdit_8.setPlainText(_translate("Form", restname2))
-        self.adminPlainTextEdit_9.setPlainText(_translate("Form", restaddr2))
-        self.adminPlainTextEdit_6.setPlainText(
+        self.adminPlainTextEdit_10.setText(_translate("Form", restpass2))
+        self.adminPlainTextEdit_8.setText(_translate("Form", restname2))
+        self.adminPlainTextEdit_9.setText(_translate("Form", restaddr2))
+        self.adminPlainTextEdit_6.setText(
             _translate("Form", str(restminpay2)))
 
     # --- END FARUK BUTTON HANDLING
