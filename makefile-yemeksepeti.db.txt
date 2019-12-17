@@ -1,0 +1,51 @@
+CREATE TABLE "customer" (
+	"id"	TEXT NOT NULL,
+	"pass"	TEXT NOT NULL,
+	"fname"	TEXT NOT NULL,
+	"lname"	TEXT NOT NULL,
+	"telNo"	INTEGER,
+	"address"	TEXT,
+	PRIMARY KEY("id")
+);
+CREATE TABLE "order_line" (
+	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	"quantity"	INTEGER NOT NULL,
+	"p_id"	INTEGER NOT NULL,
+	"order_id"	INTEGER NOT NULL,
+	FOREIGN KEY("p_id") REFERENCES "product"("id"),
+	FOREIGN KEY("order_id") REFERENCES "order_table"("id")
+);
+CREATE TABLE "order_table" (
+	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	"purchase_date"	TEXT,
+	"cus_id"	TEXT,
+	FOREIGN KEY("cus_id") REFERENCES "customer"("id")
+);
+CREATE TABLE "product" (
+	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	"name"	TEXT NOT NULL,
+	"price"	INTEGER NOT NULL CHECK(price>0),
+	"r_id"	TEXT NOT NULL,
+	"category"	TEXT,
+	"ingredients"	TEXT,
+	FOREIGN KEY("r_id") REFERENCES "restaurant"("id")
+);
+CREATE TABLE "product_image" (
+	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	"url"	TEXT,
+	"p_id"	INTEGER,
+	FOREIGN KEY("p_id") REFERENCES "product"("id")
+);
+CREATE TABLE "restaurant" (
+	"id"	TEXT NOT NULL,
+	"pass"	TEXT NOT NULL,
+	"name"	TEXT NOT NULL UNIQUE,
+	"address"	TEXT NOT NULL,
+	"min_pay"	INTEGER NOT NULL,
+	PRIMARY KEY("id")
+);
+
+insert into customer values
+('thmyris','5','Ahmet Faruk','Albayrak',5054549550,'KYK NUSAT')
+('cansozbir','5','Can','Sözbir',null,'manchester')
+('sasenka','5','Göksel','Aktaş',5054530155,'summoners rift')
