@@ -49,7 +49,7 @@ class productQWidget(QWidget):
         self.nameLabel = QLabel(str(name))
         self.ingredientsLabel = QLabel(str(ingredients))
         self.categoryLabel = QLabel(str(category))
-        self.priceLabel = QLabel(str(price))
+        self.priceLabel = QLabel(str(price)+'tl')
         self.button = QPushButton("+")
         self.button.setMaximumSize(QtCore.QSize(44, 44))
 
@@ -60,6 +60,7 @@ class productQWidget(QWidget):
         self.vLayout.addWidget(self.categoryLabel)
         self.hLayout.addWidget(self.imageLabel)
         self.hLayout.addLayout(self.vLayout)
+        self.hLayout.addWidget(self.priceLabel)
         self.hLayout.addWidget(self.button)
 
         self.setLayout(self.hLayout)
