@@ -8,9 +8,9 @@ from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMessageBox, QPushButton, QVBoxLayout, QWidget
 
 authInfo = {
-    'id': 'thmyris',
-    'password': '5',
-    'type': 'restaurant'
+    'id': 'placeholder',
+    'password': 'placeholder',
+    'type': 'placeholder'
 }
 
 conn = sqlite3.connect('yemeksepeti.db')
